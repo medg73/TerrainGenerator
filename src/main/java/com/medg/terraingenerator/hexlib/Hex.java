@@ -12,22 +12,22 @@ public class Hex {
 
     private final int q, r, s;
 
-    Hex(int q, int r, int s) {
+    public Hex(int q, int r, int s) {
         assert(q + r + s == 0);
         this.q = q;
         this.r = r;
         this.s = s;
     }
 
-    int getQ() {
+    public int getQ() {
         return q;
     }
 
-    int getR() {
+    public int getR() {
         return r;
     }
 
-    int getS() {
+    public int getS() {
         return s;
     }
 
@@ -56,11 +56,31 @@ public class Hex {
         return this.add(DIRECTIONS[direction]);
     }
 
-    Point toPixel(Layout layout) {
+    public Point toPixel(Layout layout) {
         double x = (layout.orientation.f0 * this.getQ() + layout.orientation.f1 * this.getR()) * layout.size.x;
         double y = (layout.orientation.f2 * this.getQ() + layout.orientation.f3 * this.getR()) * layout.size.y;
         return new Point(x + layout.origin.x, y + layout.origin.y);
     }
+
+    public Point[] polygonCorners(Layout layout) {
+        Point[] corners = new Point[6];
+        Point center = toPixel(layout);
+        for(int i = 0; i < 6; i++) {
+            Point offset = hexCornerOffset(layout, i);
+            corners[i] = new Point(center.x + offset.x,
+                    center.y + offset.y);
+        }
+        return corners;
+    }
+
+    private Point hexCornerOffset(Layout layout, int corner) {
+        Point size = layout.size;
+        double angle = 2.0 * Math.PI * (layout.orientation.startAngle + corner) / 6;
+        return new Point(size.x * Math.cos(angle), size.y * Math.sin(angle));
+
+    }
+
+
 
     @Override
     public boolean equals(Object o) {

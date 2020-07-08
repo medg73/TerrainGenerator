@@ -3,6 +3,7 @@ package com.medg.terraingenerator.hexlib;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class HexTest {
 
@@ -84,6 +85,29 @@ public class HexTest {
         Point pixel4 = hex4.toPixel(layout);
         assertEquals(0.0, pixel4.x, 0.0);
         assertEquals(30.0, pixel4.y, 0.0);
+
+    }
+
+    @Test
+    public void testPolygonCorners() {
+        Point size = new Point(10,10);
+        Point origin = new Point(0, 0);
+        Layout layout = new Layout(Orientation.LAYOUT_POINTY, size, origin);
+        Hex hex1 = new Hex(0, 0, 0);
+        Point[] corners = hex1.polygonCorners(layout);
+
+        assertEquals(8.66, corners[0].x, 0.001);
+        assertEquals(5.0, corners[0].y, 0.001);
+        assertEquals(0.0, corners[1].x, 0.001);
+        assertEquals(10.0, corners[1].y, 0.001);
+        assertEquals(-8.66, corners[2].x, 0.001);
+        assertEquals(5.0, corners[2].y, 0.001);
+        assertEquals(-8.66, corners[3].x, 0.001);
+        assertEquals(-5.0, corners[3].y, 0.001);
+        assertEquals(0.0, corners[4].x, 0.001);
+        assertEquals(-10.0, corners[4].y, 0.001);
+        assertEquals(8.66, corners[5].x, 0.001);
+        assertEquals(-5.0, corners[5].y, 0.001);
 
     }
 }
