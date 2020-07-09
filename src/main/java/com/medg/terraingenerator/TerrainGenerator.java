@@ -1,12 +1,12 @@
 package com.medg.terraingenerator;
 
-import com.medg.terraingenerator.hexlib.Hex;
-import com.medg.terraingenerator.hexlib.Layout;
-import com.medg.terraingenerator.hexlib.Orientation;
+import com.medg.terraingenerator.hexlib.*;
 import com.medg.terraingenerator.hexlib.Point;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -43,6 +43,8 @@ class HexPanel extends JPanel {
     Layout layout;
     int hexSize = 40;
     int center = 250;
+    Orientation orientation = Orientation.LAYOUT_FLAT;
+    Hex selectedHex;
 
     public HexPanel() {
         setBackground(Color.WHITE);
@@ -57,9 +59,15 @@ class HexPanel extends JPanel {
                 }
             }
         }
-        hexes.add(new Hex(0, 0, 0));
+        selectedHex = new Hex(0, 0, 0);
 
-        layout = new Layout(Orientation.LAYOUT_FLAT, new Point(hexSize,hexSize), new Point(center, center));
+        layout = new Layout(orientation, new Point(hexSize,hexSize), new Point(center, center));
+
+        addMouseListener(new MouseAdapter(){
+            public void mousePressed(MouseEvent e){
+                selectHex(e.getX(),e.getY());
+            }
+        });
     }
 
 
@@ -76,18 +84,34 @@ class HexPanel extends JPanel {
         g.setColor(Color.BLUE);
         for(Hex hex : hexes) {
             Point[] cornerPoints = hex.polygonCorners(layout);
-            for(int i = 1; i < cornerPoints.length; i++) {
-                int startX = (int)Math.round(cornerPoints[i - 1].x);
-                int startY = (int)Math.round(cornerPoints[i - 1].y);
-                int endX = (int)Math.round(cornerPoints[i].x);
-                int endY = (int)Math.round(cornerPoints[i].y);
-                g.drawLine(startX, startY, endX, endY);
+            int[] xpoints = new int[6];
+            int[] ypoints = new int[6];
+            for(int i = 0; i < cornerPoints.length; i++) {
+                xpoints[i] = (int)Math.round(cornerPoints[i].x);
+                ypoints[i] = (int)Math.round(cornerPoints[i].y);
             }
-            int startX = (int)Math.round(cornerPoints[5].x);
-            int startY = (int)Math.round(cornerPoints[5].y);
-            int endX = (int)Math.round(cornerPoints[0].x);
-            int endY = (int)Math.round(cornerPoints[0].y);
-            g.drawLine(startX, startY, endX, endY);
+            Polygon polygon = new Polygon(xpoints, ypoints, 6);
+            if(hex.equals(selectedHex)) {
+                g.setColor(Color.YELLOW);
+            } else {
+                g.setColor(Color.WHITE);
+            }
+            g.fillPolygon(polygon);
+            g.setColor(Color.BLUE);
+            g.drawPolygon(polygon);
+
+//            for(int i = 1; i < cornerPoints.length; i++) {
+//                int startX = (int)Math.round(cornerPoints[i - 1].x);
+//                int startY = (int)Math.round(cornerPoints[i - 1].y);
+//                int endX = (int)Math.round(cornerPoints[i].x);
+//                int endY = (int)Math.round(cornerPoints[i].y);
+//                g.drawLine(startX, startY, endX, endY);
+//            }
+//            int startX = (int)Math.round(cornerPoints[5].x);
+//            int startY = (int)Math.round(cornerPoints[5].y);
+//            int endX = (int)Math.round(cornerPoints[0].x);
+//            int endY = (int)Math.round(cornerPoints[0].y);
+//            g.drawLine(startX, startY, endX, endY);
 
             String hexCoords = hex.getQ() + "," + hex.getR()
                     + "," + hex.getS();
@@ -98,4 +122,14 @@ class HexPanel extends JPanel {
         }
 
     }
+
+    private void selectHex(int x, int y) {
+        FractionalHex fractionalHex = layout.pixelToHex(new Point(x, y));
+        Hex selectedHex = fractionalHex.round();
+        System.out.println("selected hex is: " + selectedHex.getQ() + "," + selectedHex.getR() + "," + selectedHex.getS());
+        this.selectedHex = selectedHex;
+        repaint();
+    }
+
+
 }
