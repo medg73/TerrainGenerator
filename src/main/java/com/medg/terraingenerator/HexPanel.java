@@ -36,11 +36,9 @@ class HexPanel extends JPanel {
         });
     }
 
-
     public Dimension getPreferredSize() {
         return new Dimension(500,500);
     }
-
 
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -53,7 +51,6 @@ class HexPanel extends JPanel {
             }
             drawHex(g, hex, fillColor);
         }
-
     }
 
     private void drawHex(Graphics g, Hex hex, Color fillColor) {
@@ -70,8 +67,6 @@ class HexPanel extends JPanel {
         g.setColor(Color.BLUE);
         g.drawPolygon(polygon);
 
-//        String hexCoords = hex.getQ() + "," + hex.getR()
-//                + "," + hex.getS();
         com.medg.terraingenerator.hexlib.Point centerPoint = hex.toPixel(layout);
         int centerX = (int)Math.round(centerPoint.x - (hexSize / 2));
         int centerY = (int)Math.round(centerPoint.y);
@@ -94,6 +89,4 @@ class HexPanel extends JPanel {
         }
         repaint();
     }
-
-
 }
