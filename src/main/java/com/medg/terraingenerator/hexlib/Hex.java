@@ -73,6 +73,26 @@ public class Hex {
         return corners;
     }
 
+    public Hex[] linedraw(Hex hex) {
+        int distance = distance(hex);
+        Hex[] results = new Hex[distance + 1];
+        double step = 1.0 / Math.max(distance, 1);
+        for(int i = 0; i <= distance; i++) {
+            results[i] = hexLerp(this, hex, step * i).round();
+        }
+        return results;
+    }
+
+    private FractionalHex hexLerp(Hex a, Hex b, double t) {
+        return new FractionalHex(lerp(a.getQ(), b.getQ(), t),
+                                 lerp(a.getR(), b.getR(), t),
+                                 lerp(a.getS(), b.getS(), t));
+    }
+
+    private double lerp(double a, double b, double t) {
+        return a * (1-t) + b * t;
+    }
+
     private Point hexCornerOffset(Layout layout, int corner) {
         Point size = layout.size;
         double angle = 2.0 * Math.PI * (layout.orientation.startAngle + corner) / 6;
@@ -95,5 +115,14 @@ public class Hex {
     @Override
     public int hashCode() {
         return Objects.hash(q, r, s);
+    }
+
+    @Override
+    public String toString() {
+        return "Hex{" +
+                "q=" + q +
+                ", r=" + r +
+                ", s=" + s +
+                '}';
     }
 }

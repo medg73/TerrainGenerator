@@ -110,4 +110,27 @@ public class HexTest {
         assertEquals(-5.0, corners[5].y, 0.001);
 
     }
+
+    @Test
+    public void testLinedraw() {
+        Hex start = new Hex(0,0,0);
+        Hex end = new Hex(3, -1, -2);
+        Hex[] lineHexes = start.linedraw(end);
+        assertEquals(4, lineHexes.length);
+        assertEquals(start, lineHexes[0]);
+        assertEquals(new Hex(1, 0, -1), lineHexes[1]);
+        assertEquals(new Hex(2, -1, -1), lineHexes[2]);
+        assertEquals(end, lineHexes[3]);
+
+        Hex[] lineHexes2 = start.linedraw(start);
+        assertEquals(1, lineHexes2.length);
+        assertEquals(start, lineHexes[0]);
+
+        Hex[] lineHexes3 = end.linedraw(start);
+        assertEquals(4, lineHexes3.length);
+        assertEquals(end, lineHexes3[0]);
+        assertEquals(new Hex(2, -1, -1), lineHexes3[1]);
+        assertEquals(new Hex(1, 0, -1), lineHexes3[2]);
+        assertEquals(start, lineHexes3[3]);
+    }
 }
