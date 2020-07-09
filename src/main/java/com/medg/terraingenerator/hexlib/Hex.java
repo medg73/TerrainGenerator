@@ -119,10 +119,11 @@ public class Hex {
 
     @Override
     public String toString() {
-        return "Hex{" +
-                "q=" + q +
-                ", r=" + r +
-                ", s=" + s +
-                '}';
+//        return "Hex{" +
+//                "q=" + q +
+//                ", r=" + r +
+//                ", s=" + s +
+//                '}';
+        return q + "," + r + "," + s;
     }
 }
