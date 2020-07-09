@@ -12,22 +12,24 @@ import java.util.Set;
 
 class HexPanel extends JPanel {
 
-    HexMap hexMap;
+    RectangularHexMap hexMap;
     Layout layout;
     int hexSize = 40;
     int hexMapHeight = 10;
     int hexMapWidth = 10;
-    Orientation orientation = Orientation.LAYOUT_FLAT;
+    Orientation orientation = Orientation.LAYOUT_POINTY;
     Hex selectedHex1, selectedHex2;
     Set<Hex> highlightedHexes;
     Point centerOfOriginHex = new Point(hexSize, hexSize);
+//    Point centerOfOriginHex = new Point(250, 250);
 
     public HexPanel() {
         setBackground(Color.WHITE);
 
         layout = new Layout(orientation, new com.medg.terraingenerator.hexlib.Point(hexSize,hexSize), centerOfOriginHex);
 
-        hexMap = new HexMap(hexMapWidth,hexMapHeight,layout);
+        hexMap = new RectangularHexMap(hexMapWidth,hexMapHeight,layout);
+//        hexMap = new HexagonHexMap(hexMapWidth);
 
         addMouseListener(new MouseAdapter(){
             public void mousePressed(MouseEvent e){
@@ -76,7 +78,10 @@ class HexPanel extends JPanel {
     private void selectHex(int x, int y) {
         FractionalHex fractionalHex = layout.pixelToHex(new Point(x, y));
         Hex selectedHex = fractionalHex.round();
-        System.out.println("selected hex is: " + selectedHex);
+//        System.out.println("selected hex is: " + selectedHex);
+        OffsetCoord offsetCoord = hexMap.getOffsetCoord(selectedHex);
+        System.out.println("row = " + offsetCoord.row + " col = " + offsetCoord.col);
+
         if(selectedHex1 == null) {
             selectedHex1 = selectedHex;
         } else if(selectedHex2 == null) {
