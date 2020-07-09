@@ -4,6 +4,6 @@ hex grid reference: https://www.redblobgames.com/grids/hexagons/
 implementation: https://www.redblobgames.com/grids/hexagons/implementation.html
 
 TODO:
-map to offset coords
-scrollbars
+map to offset coords - done
+scrollbars - done
 terrain!
