@@ -3,38 +3,72 @@ package com.medg.terraingenerator;
 import com.medg.terraingenerator.dice.Dice;
 import com.medg.terraingenerator.hexlib.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class HexBoard {
 
     private RectangularHexMap hexMap;
     private Layout layout;
-    private int hexSize = 40;
-    private int hexMapHeight = 100;
-    private int hexMapWidth = 100;
+    private int hexSize = 4;
+    private int hexMapHeight;
+    private int hexMapWidth;
     private Orientation orientation = Orientation.LAYOUT_POINTY;
     private Point centerOfOriginHex = new Point(hexSize, hexSize);
     private Dice dice;
 
-    private Map<Hex, Terrain> terrainMap;
+//    private Map<Hex, Terrain> terrainMap;
+    private Map<Hex, Integer> elevationMap;
 
-    public HexBoard(Dice dice) {
+    public HexBoard(Dice dice, int mapHeight, int mapWidth) {
 
         this.dice = dice;
+        this.hexMapHeight = mapHeight;
+        this.hexMapWidth = mapWidth;
 
         layout = new Layout(orientation, new com.medg.terraingenerator.hexlib.Point(hexSize,hexSize), centerOfOriginHex);
         hexMap = new RectangularHexMap(hexMapWidth,hexMapHeight,layout);
 
-        terrainMap = new HashMap<>();
+        elevationMap = new HashMap<>();
         for(Hex hex : hexMap.getHexes()) {
             int elevation = dice.rollPercent();
-            if(elevation < 25) {
-                terrainMap.put(hex, Terrain.WATER);
-            } else {
-                terrainMap.put(hex, Terrain.LAND);
-            }
+            elevationMap.put(hex, elevation);
+//            System.out.println(hexMap.getOffsetCoord(hex).toString() + " elevation is: " + elevation);
+//            if(elevation < 25) {
+//                terrainMap.put(hex, Terrain.WATER);
+//            } else {
+//                terrainMap.put(hex, Terrain.LAND);
+//            }
 
+        }
+    }
+
+    public void weather() {
+        for(Hex hex : hexMap.getHexes()) {
+            int hexHeight = elevationMap.get(hex);
+            Hex[] neighbors = hex.getAllNeighbors();
+            List<Integer> elevationDiffs = new ArrayList<>();
+            for(int i = 0; i < neighbors.length; i++) {
+                if(elevationMap.keySet().contains(neighbors[i])) {
+                    int elevationDiff = elevationMap.get(hex) - elevationMap.get(neighbors[i]);
+                    elevationDiffs.add(elevationDiff);
+                }
+            }
+            int steepestSlope = 0;
+            for(int i = 0; i < elevationDiffs.size(); i++) {
+                if(elevationDiffs.get(i) > 0 && elevationDiffs.get(i) > steepestSlope) {
+                    steepestSlope = elevationDiffs.get(i);
+                }
+            }
+            if(steepestSlope > 0) {
+                int erosion = dice.rollD10();
+                if(erosion > steepestSlope) {
+                    erosion = steepestSlope;
+                }
+                elevationMap.put(hex, hexHeight - erosion);
+            }
         }
     }
 
@@ -42,9 +76,13 @@ public class HexBoard {
         return hexMap;
     }
 
-    public Terrain getTerrain(Hex hex) {
-        return terrainMap.get(hex);
+    public Integer getElevation(Hex hex) {
+        return elevationMap.get(hex);
     }
+
+//    public Terrain getTerrain(Hex hex) {
+//        return terrainMap.get(hex);
+//    }
 
     public int getHexMapHeight() {
         return hexMapHeight;

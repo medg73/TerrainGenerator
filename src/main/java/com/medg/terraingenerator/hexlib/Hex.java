@@ -51,6 +51,14 @@ public class Hex {
         return (qDiff + rDiff + sDiff) / 2;
     }
 
+    public Hex[] getAllNeighbors() {
+        Hex[] neighbors = new Hex[6];
+        for(int i = 0; i < 6; i++) {
+            neighbors[i] = this.neighbor(i);
+        }
+        return neighbors;
+    }
+
     Hex neighbor(int direction) {
         assert(direction >= 0 && direction < 6);
         return this.add(DIRECTIONS[direction]);

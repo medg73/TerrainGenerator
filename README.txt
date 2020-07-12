@@ -6,4 +6,10 @@ implementation: https://www.redblobgames.com/grids/hexagons/implementation.html
 TODO:
 map to offset coords - done
 scrollbars - done
-terrain!
+split out graphics code from TerrainGenerator
+fix scrolling with pad
+make random terrain more realistic, or allow drawing
+rivers (edge features) - or not
+roads (connected lines)
+sprites and movement cost
+add world map view

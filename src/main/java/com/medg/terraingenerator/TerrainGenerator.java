@@ -2,10 +2,18 @@ package com.medg.terraingenerator;
 
 import com.medg.terraingenerator.dice.Dice;
 import com.medg.terraingenerator.dice.RandomNumberGenerator;
+import com.medg.terraingenerator.ui.TerrainGeneratorFrame;
 
 import javax.swing.*;
 
 public class TerrainGenerator {
+
+    private static Dice dice;
+    private static HexBoard hexBoard;
+
+    private static int mapHeight = 100;
+    private static int mapWidth = 100;
+
 
     public static void main(String[] args) {
 
@@ -21,18 +29,9 @@ public class TerrainGenerator {
                 SwingUtilities.isEventDispatchThread());
 
         RandomNumberGenerator randomNumberGenerator = new RandomNumberGenerator();
-        Dice dice = new Dice(randomNumberGenerator);
-        HexBoard hexBoard = new HexBoard(dice);
-
-        HexPanel hexPanel = new HexPanel(hexBoard);
-        JScrollPane scrollPane = new JScrollPane(hexPanel);
-
-        JFrame f = new JFrame("Terrain Generator");
-        f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        f.add(scrollPane);
-        f.setSize(500,500);
-        f.setVisible(true);
+        dice = new Dice(randomNumberGenerator);
+        hexBoard = new HexBoard(dice, mapHeight, mapWidth);
+        TerrainGeneratorFrame terrainGeneratorFrame = new TerrainGeneratorFrame(hexBoard, dice);
     }
-
 
 }

@@ -60,6 +60,28 @@ public class HexTest {
     }
 
     @Test
+    public void testGetAllNeighbors() {
+        Hex hexBase = new Hex(-1, -1, 2);
+        Hex hex0 = new Hex(0, -1, 1);
+        Hex hex1 = new Hex(0, -2, 2);
+        Hex hex2 = new Hex(-1, -2, 3);
+        Hex hex3 = new Hex(-2, -1, 3);
+        Hex hex4 = new Hex(-2, 0, 2);
+        Hex hex5 = new Hex(-1, 0, 1);
+
+        Hex[] neighbors = hexBase.getAllNeighbors();
+        assertEquals(6, neighbors.length);
+
+        assertEquals(hex0, neighbors[0]);
+        assertEquals(hex1, neighbors[1]);
+        assertEquals(hex2, neighbors[2]);
+        assertEquals(hex3, neighbors[3]);
+        assertEquals(hex4, neighbors[4]);
+        assertEquals(hex5, neighbors[5]);
+
+    }
+
+    @Test
     public void testToPixel() {
         Point size = new Point(10,10);
         Point origin = new Point(0, 0);
