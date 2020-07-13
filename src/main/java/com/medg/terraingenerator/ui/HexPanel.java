@@ -8,6 +8,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.geom.AffineTransform;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -26,6 +27,7 @@ class HexPanel extends JPanel {
     Map<Hex, Polygon> hexPolygonMap;
     boolean showWaterLevel = false;
     int waterLevel = 25;
+    double zoomFactor = 1.0;
 
     public HexPanel(HexBoard hexBoard) {
         setBackground(Color.WHITE);
@@ -56,29 +58,44 @@ class HexPanel extends JPanel {
     }
 
     public Dimension getPreferredSize() {
-        return new Dimension(hexMapWidth * hexSize * 2,hexMapHeight * hexSize * 2);
+        int width, height;
+        if(layout.getOrientation().equals(Orientation.LAYOUT_POINTY)) {
+            width = (int) (hexMapWidth * hexSize * 1.75 * zoomFactor);
+            height = (int) (hexMapHeight * hexSize * 1.51 * zoomFactor);
+        } else {
+            width = (int) (hexMapWidth * hexSize * 1.51 * zoomFactor);
+            height = (int) (hexMapHeight * hexSize * 1.75 * zoomFactor);
+        }
+        return new Dimension(width, height);
     }
 
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
 
+        Graphics2D graphics2D = (Graphics2D) g;
+        AffineTransform affineTransform = graphics2D.getTransform();
+        graphics2D.scale(zoomFactor, zoomFactor);
+
         for(Hex hex : hexMap.getHexes()) {
             Color fillColor = getFillColor(hex);
             Color edgeColor = fillColor;
-            drawHex(g, hex, fillColor, edgeColor);
+            drawHex(graphics2D, hex, fillColor, edgeColor);
         }
 
         if(selectedHex1 != null) {
-            drawHex(g, selectedHex1, getFillColor(selectedHex1), Color.YELLOW);
+            drawHex(graphics2D, selectedHex1, getFillColor(selectedHex1), Color.YELLOW);
         }
         if(selectedHex2 != null) {
-            drawHex(g, selectedHex2, getFillColor(selectedHex2), Color.YELLOW);
+            drawHex(graphics2D, selectedHex2, getFillColor(selectedHex2), Color.YELLOW);
         }
         if(highlightedHexes != null) {
             for(Hex hex :highlightedHexes) {
-                drawHex(g, hex, getFillColor(hex), Color.YELLOW);
+                drawHex(graphics2D, hex, getFillColor(hex), Color.YELLOW);
             }
         }
+
+        graphics2D.setTransform(affineTransform);
+
     }
 
     public int getWaterLevel() {
@@ -96,6 +113,10 @@ class HexPanel extends JPanel {
 
     public void setShowWaterLevel(boolean showWaterLevel) {
         this.showWaterLevel = showWaterLevel;
+    }
+
+    public void setZoomFactor(int zoomFactor) {
+        this.zoomFactor = 1.0 / zoomFactor;
     }
 
     private void storeHexPolygons() {
@@ -132,13 +153,14 @@ class HexPanel extends JPanel {
 //        }
     }
 
-    private void drawHex(Graphics g, Hex hex, Color fillColor, Color edgeColor) {
+    private void drawHex(Graphics2D graphics2D, Hex hex, Color fillColor, Color edgeColor) {
 
         Polygon polygon = hexPolygonMap.get(hex);
-        g.setColor(fillColor);
-        g.fillPolygon(polygon);
-        g.setColor(edgeColor);
-        g.drawPolygon(polygon);
+
+        graphics2D.setColor(fillColor);
+        graphics2D.fillPolygon(polygon);
+        graphics2D.setColor(edgeColor);
+        graphics2D.drawPolygon(polygon);
 
 //        com.medg.terraingenerator.hexlib.Point centerPoint = hex.toPixel(layout);
 //        int centerX = (int)Math.round(centerPoint.x - (hexSize / 2));
@@ -148,23 +170,27 @@ class HexPanel extends JPanel {
     }
 
     private void selectHex(int x, int y) {
-        FractionalHex fractionalHex = layout.pixelToHex(new Point(x, y));
+        int scaledX = (int)(x / zoomFactor);
+        int scaledY = (int)(y / zoomFactor);
+        FractionalHex fractionalHex = layout.pixelToHex(new Point(scaledX, scaledY));
         Hex selectedHex = fractionalHex.round();
 //        System.out.println("selected hex is: " + selectedHex);
         OffsetCoord offsetCoord = hexMap.getOffsetCoord(selectedHex);
-        int elevation = hexBoard.getElevation(selectedHex);
-        System.out.println("row = " + offsetCoord.row + " col = " + offsetCoord.col + " elevation = " + elevation);
+        if(hexMap.getHexes().contains(selectedHex)) {
+            int elevation = hexBoard.getElevation(selectedHex);
+            System.out.println("row = " + offsetCoord.row + " col = " + offsetCoord.col + " elevation = " + elevation);
 
-        if(selectedHex1 == null) {
-            selectedHex1 = selectedHex;
-        } else if(selectedHex2 == null) {
-            selectedHex2 = selectedHex;
-            highlightedHexes = new HashSet<>(Set.of(selectedHex1.linedraw(selectedHex2)));
-        } else {
-            selectedHex1 = null;
-            selectedHex2 = null;
-            highlightedHexes = null;
+            if (selectedHex1 == null) {
+                selectedHex1 = selectedHex;
+            } else if (selectedHex2 == null) {
+                selectedHex2 = selectedHex;
+                highlightedHexes = new HashSet<>(Set.of(selectedHex1.linedraw(selectedHex2)));
+            } else {
+                selectedHex1 = null;
+                selectedHex2 = null;
+                highlightedHexes = null;
+            }
+            repaint();
         }
-        repaint();
     }
 }

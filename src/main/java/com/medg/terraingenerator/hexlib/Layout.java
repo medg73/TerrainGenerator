@@ -19,4 +19,8 @@ public class Layout {
         double r = orientation.b2 * pt.x + orientation.b3 * pt.y;
         return new FractionalHex(q, r, -q - r);
     }
+
+    public Orientation getOrientation() {
+        return orientation;
+    }
 }

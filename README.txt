@@ -4,12 +4,17 @@ hex grid reference: https://www.redblobgames.com/grids/hexagons/
 implementation: https://www.redblobgames.com/grids/hexagons/implementation.html
 
 TODO:
-map to offset coords - done
-scrollbars - done
-split out graphics code from TerrainGenerator
-fix scrolling with pad
+wrapping map
+fix scrolling with pad - done
 make random terrain more realistic, or allow drawing
-rivers (edge features) - or not
-roads (connected lines)
-sprites and movement cost
+rivers - based on steepness of slope into hex and # of hexes draining into this one
 add world map view
+
+zooming
+bug - when zooming out, if you are off the panel you lose it - zooming should always keep panel in view
+
+draw terrain
+
+game stuff:
+sprites and movement cost
+roads

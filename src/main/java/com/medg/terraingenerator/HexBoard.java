@@ -12,21 +12,23 @@ public class HexBoard {
 
     private RectangularHexMap hexMap;
     private Layout layout;
-    private int hexSize = 4;
+    private int hexSize;
     private int hexMapHeight;
     private int hexMapWidth;
-    private Orientation orientation = Orientation.LAYOUT_POINTY;
-    private Point centerOfOriginHex = new Point(hexSize, hexSize);
+    private Orientation orientation = Orientation.LAYOUT_FLAT;
+    private Point centerOfOriginHex;
     private Dice dice;
 
 //    private Map<Hex, Terrain> terrainMap;
     private Map<Hex, Integer> elevationMap;
 
-    public HexBoard(Dice dice, int mapHeight, int mapWidth) {
+    public HexBoard(Dice dice, int mapHeight, int mapWidth, int hexSize) {
 
         this.dice = dice;
         this.hexMapHeight = mapHeight;
         this.hexMapWidth = mapWidth;
+        this.hexSize = hexSize;
+        this.centerOfOriginHex = new Point(hexSize, hexSize);
 
         layout = new Layout(orientation, new com.medg.terraingenerator.hexlib.Point(hexSize,hexSize), centerOfOriginHex);
         hexMap = new RectangularHexMap(hexMapWidth,hexMapHeight,layout);

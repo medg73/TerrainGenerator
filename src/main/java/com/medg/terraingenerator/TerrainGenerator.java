@@ -13,6 +13,7 @@ public class TerrainGenerator {
 
     private static int mapHeight = 100;
     private static int mapWidth = 100;
+    private static int hexSize = 40;
 
 
     public static void main(String[] args) {
@@ -30,7 +31,7 @@ public class TerrainGenerator {
 
         RandomNumberGenerator randomNumberGenerator = new RandomNumberGenerator();
         dice = new Dice(randomNumberGenerator);
-        hexBoard = new HexBoard(dice, mapHeight, mapWidth);
+        hexBoard = new HexBoard(dice, mapHeight, mapWidth, hexSize);
         TerrainGeneratorFrame terrainGeneratorFrame = new TerrainGeneratorFrame(hexBoard, dice);
     }
 
