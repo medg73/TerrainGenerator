@@ -129,8 +129,7 @@ class HexPanel extends JPanel {
 
 
     private void drawAllRivers(Graphics2D graphics2D) {
-        River allRivers = hexBoard.getAllRivers();
-        Set<RiverPair> riverPairs = allRivers.getRiverPairSet();
+        Set<RiverPair> riverPairs = hexBoard.getAllRivers();
         for(RiverPair riverPair : riverPairs) {
             Hex[] hexes = riverPair.getHexArray();
             java.awt.Point point1 = centerPointMap.get(hexes[0]);

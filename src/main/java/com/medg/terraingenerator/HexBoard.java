@@ -3,10 +3,7 @@ package com.medg.terraingenerator;
 import com.medg.terraingenerator.dice.Dice;
 import com.medg.terraingenerator.hexlib.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class HexBoard {
 
@@ -18,7 +15,10 @@ public class HexBoard {
     private Orientation orientation = Orientation.LAYOUT_FLAT;
     private Point centerOfOriginHex;
     private Dice dice;
-    private River allRivers;
+
+    private Set<RiverPair> allRivers;
+
+    private Map<Hex, Integer> flowIntoHex;
 
 //    private Map<Hex, Terrain> terrainMap;
     private Map<Hex, Integer> elevationMap;
@@ -30,7 +30,8 @@ public class HexBoard {
         this.hexMapWidth = mapWidth;
         this.hexSize = hexSize;
         this.centerOfOriginHex = new Point(hexSize, hexSize);
-        allRivers = new River();
+        allRivers = new HashSet<>();
+        flowIntoHex = new HashMap<>();
 
         layout = new Layout(orientation, new com.medg.terraingenerator.hexlib.Point(hexSize,hexSize), centerOfOriginHex);
         hexMap = new RectangularHexMap(hexMapWidth,hexMapHeight,layout);
@@ -51,7 +52,11 @@ public class HexBoard {
 
     public void weather() {
 
-        allRivers = new River();
+        Map<Hex, RiverPair> riverPairsByHighHex = new HashMap<>();
+        Map<Hex, List<RiverPair>> riverPairsByLowHex = new HashMap<>();
+
+        allRivers = new HashSet<>();
+        flowIntoHex = new HashMap<>();
         for(Hex hex : hexMap.getHexes()) {
             int hexHeight = elevationMap.get(hex);
             Hex[] neighbors = hex.getAllNeighbors();
@@ -78,11 +83,56 @@ public class HexBoard {
                     erosion = steepestSlope;
                 }
                 elevationMap.put(hex, hexHeight - erosion);
-            }
-            if(steepestNeighbor != null) {
-                allRivers.add(new RiverPair(hex, steepestNeighbor));
+                RiverPair riverPair = new RiverPair(hex, steepestNeighbor, erosion);
+                riverPairsByHighHex.put(hex, riverPair);
+                List<RiverPair> riverPairs = riverPairsByLowHex.computeIfAbsent(steepestNeighbor, k -> new ArrayList<>());
+                riverPairs.add(riverPair);
+                allRivers.add(riverPair);
             }
         }
+
+        List<Hex> riverSources = new ArrayList<>();
+        for(RiverPair riverPair : allRivers) {
+            Hex highHex = riverPair.getHighHex();
+            if(riverPairsByLowHex.get(highHex) == null) { // river start
+                riverSources.add(highHex);
+            }
+        }
+
+        for(Hex sourceHex : riverSources) {
+            RiverPair startingRiverPair = riverPairsByHighHex.get(sourceHex);
+            Hex lowHex = startingRiverPair.getLowHex();
+            RiverPair downstreamRiverPair = riverPairsByHighHex.get(lowHex);
+            RiverPair upstreamRiverPair = startingRiverPair;
+            while(downstreamRiverPair != null) {
+                downstreamRiverPair.addUpstreamRiverPair(upstreamRiverPair);
+                upstreamRiverPair.setDownstreamRiverPair(downstreamRiverPair);
+                downstreamRiverPair.setFlow(downstreamRiverPair.getFlow() + upstreamRiverPair.getFlow());
+                upstreamRiverPair = downstreamRiverPair;
+                downstreamRiverPair = riverPairsByHighHex.get(downstreamRiverPair.getLowHex());
+            }
+        }
+    }
+
+    public int getFlowByRiverPair(RiverPair riverPair) {
+        int rv = 0;
+        for(RiverPair myRiverPair : allRivers) {
+            if(myRiverPair.equals(riverPair)) {
+                rv = myRiverPair.getFlow();
+                break;
+            }
+        }
+        return rv;
+    }
+
+    public Integer getFlowIntoHex(Hex hex) {
+        int rv = 0;
+        for(RiverPair riverPair : allRivers) {
+            if(riverPair.getLowHex().equals(hex)) {
+                rv += riverPair.getFlow();
+            }
+        }
+        return rv;
     }
 
     public RectangularHexMap getHexMap() {
@@ -113,7 +163,15 @@ public class HexBoard {
         return layout;
     }
 
-    public River getAllRivers() {
+    public Set<RiverPair> getAllRivers() {
         return allRivers;
+    }
+
+    public void setHexElevation(Hex hex, int elevation) {
+        elevationMap.put(hex, elevation);
+    }
+
+    public Hex getHexByOffsetCoord(OffsetCoord offsetCoord) {
+        return hexMap.getHex(offsetCoord);
     }
 }

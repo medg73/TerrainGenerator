@@ -6,27 +6,72 @@ import java.util.*;
 
 public class RiverPair {
 
-    private final Hex[] hexes;
+    private final Hex highHex, lowHex;
+    private int flow = 0;
+    List<RiverPair> upstreamRiverPairs;
+    RiverPair downstreamRiverPair;
 
-    public RiverPair(Hex hex1, Hex hex2) {
-        hexes = new Hex[2];
-        List<Hex> neighbors = Arrays.asList(hex1.getAllNeighbors());
-        assert(neighbors.contains(hex2));
-        assert(!hex1.equals(hex2));
+    public RiverPair(Hex highHex, Hex lowHex) {
+        List<Hex> neighbors = Arrays.asList(highHex.getAllNeighbors());
+        assert(!highHex.equals(lowHex));
+        assert(neighbors.contains(lowHex));
 
-        hexes[0] = hex1;
-        hexes[1] = hex2;
+        this.highHex = highHex;
+        this.lowHex = lowHex;
+    }
+
+    public RiverPair(Hex highHex, Hex lowHex, int flow) {
+        this(highHex, lowHex);
+        this.flow = flow;
+    }
+
+    public Hex getHighHex() {
+        return highHex;
+    }
+
+    public Hex getLowHex() {
+        return lowHex;
     }
 
     public Hex[] getHexArray() {
+        Hex[] hexes = new Hex[2];
+        hexes[0] = highHex;
+        hexes[1] = lowHex;
         return hexes;
     }
 
     public Set<Hex> getHexes() {
         Set<Hex> hexSet = new HashSet<>(2);
-        hexSet.add(hexes[0]);
-        hexSet.add(hexes[1]);
+        hexSet.add(highHex);
+        hexSet.add(lowHex);
         return hexSet;
+    }
+
+    public int getFlow() {
+        return flow;
+    }
+
+    public void setFlow(int newFlow) {
+        this.flow = newFlow;
+    }
+
+    public List<RiverPair> getUpstreamRiverPairs() {
+        return upstreamRiverPairs;
+    }
+
+    public RiverPair getDownstreamRiverPair() {
+        return downstreamRiverPair;
+    }
+
+    public void addUpstreamRiverPair(RiverPair riverPair) {
+        if(upstreamRiverPairs == null) {
+            upstreamRiverPairs = new ArrayList<>();
+        }
+        upstreamRiverPairs.add(riverPair);
+    }
+
+    public void setDownstreamRiverPair(RiverPair riverPair) {
+        downstreamRiverPair = riverPair;
     }
 
     @Override
