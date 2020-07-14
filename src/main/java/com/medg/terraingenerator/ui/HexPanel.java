@@ -1,6 +1,8 @@
 package com.medg.terraingenerator.ui;
 
 import com.medg.terraingenerator.HexBoard;
+import com.medg.terraingenerator.River;
+import com.medg.terraingenerator.RiverPair;
 import com.medg.terraingenerator.hexlib.*;
 import com.medg.terraingenerator.hexlib.Point;
 
@@ -25,6 +27,7 @@ class HexPanel extends JPanel {
     Hex selectedHex1, selectedHex2;
     Set<Hex> highlightedHexes;
     Map<Hex, Polygon> hexPolygonMap;
+    Map<Hex, java.awt.Point> centerPointMap;
     boolean showWaterLevel = false;
     int waterLevel = 25;
     double zoomFactor = 1.0;
@@ -51,6 +54,7 @@ class HexPanel extends JPanel {
 
         hexPolygonMap = new HashMap<>();
         storeHexPolygons();
+        storeHexCenterPoints();
         highlightedHexes = null;
         selectedHex1 = null;
         selectedHex2 = null;
@@ -82,21 +86,25 @@ class HexPanel extends JPanel {
             drawHex(graphics2D, hex, fillColor, edgeColor);
         }
 
+        drawAllRivers(graphics2D);
+
         if(selectedHex1 != null) {
-            drawHex(graphics2D, selectedHex1, getFillColor(selectedHex1), Color.YELLOW);
+            drawHexOutline(graphics2D, selectedHex1, Color.YELLOW);
         }
         if(selectedHex2 != null) {
-            drawHex(graphics2D, selectedHex2, getFillColor(selectedHex2), Color.YELLOW);
+            drawHexOutline(graphics2D, selectedHex2, Color.YELLOW);
         }
         if(highlightedHexes != null) {
             for(Hex hex :highlightedHexes) {
-                drawHex(graphics2D, hex, getFillColor(hex), Color.YELLOW);
+                drawHexOutline(graphics2D, hex, Color.YELLOW);
             }
         }
 
         graphics2D.setTransform(affineTransform);
 
     }
+
+
 
     public int getWaterLevel() {
         return waterLevel;
@@ -119,6 +127,20 @@ class HexPanel extends JPanel {
         this.zoomFactor = 1.0 / zoomFactor;
     }
 
+
+    private void drawAllRivers(Graphics2D graphics2D) {
+        River allRivers = hexBoard.getAllRivers();
+        Set<RiverPair> riverPairs = allRivers.getRiverPairSet();
+        for(RiverPair riverPair : riverPairs) {
+            Hex[] hexes = riverPair.getHexArray();
+            java.awt.Point point1 = centerPointMap.get(hexes[0]);
+            java.awt.Point point2 = centerPointMap.get(hexes[1]);
+
+            graphics2D.setColor(Color.BLUE);
+            graphics2D.drawLine(point1.x, point1.y, point2.x, point2.y);
+        }
+    }
+
     private void storeHexPolygons() {
         for(Hex hex : hexMap.getHexes()) {
             Point[] cornerPoints = hex.polygonCorners(layout);
@@ -130,6 +152,17 @@ class HexPanel extends JPanel {
             }
             Polygon polygon = new Polygon(xpoints, ypoints, 6);
             hexPolygonMap.put(hex, polygon);
+        }
+    }
+
+    private void storeHexCenterPoints() {
+        centerPointMap = new HashMap<>();
+        for (Hex hex : hexMap.getHexes()) {
+            Point centerPoint = hex.toPixel(layout);
+            int x = (int) Math.round(centerPoint.x);
+            int y = (int) Math.round(centerPoint.y);
+            java.awt.Point point = new java.awt.Point(x, y);
+            centerPointMap.put(hex, point);
         }
     }
 
@@ -167,6 +200,12 @@ class HexPanel extends JPanel {
 //        int centerY = (int)Math.round(centerPoint.y);
 //        g.drawString(hexBoard.getElevation(hex) +"", centerX, centerY);
 //        g.drawString(hex.toString(), centerX, centerY);
+    }
+
+    private void drawHexOutline(Graphics2D graphics2D, Hex hex, Color edgeColor) {
+        Polygon polygon = hexPolygonMap.get(hex);
+        graphics2D.setColor(edgeColor);
+        graphics2D.drawPolygon(polygon);
     }
 
     private void selectHex(int x, int y) {

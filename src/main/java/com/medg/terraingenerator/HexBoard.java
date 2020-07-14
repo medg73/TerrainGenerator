@@ -18,6 +18,7 @@ public class HexBoard {
     private Orientation orientation = Orientation.LAYOUT_FLAT;
     private Point centerOfOriginHex;
     private Dice dice;
+    private River allRivers;
 
 //    private Map<Hex, Terrain> terrainMap;
     private Map<Hex, Integer> elevationMap;
@@ -29,6 +30,7 @@ public class HexBoard {
         this.hexMapWidth = mapWidth;
         this.hexSize = hexSize;
         this.centerOfOriginHex = new Point(hexSize, hexSize);
+        allRivers = new River();
 
         layout = new Layout(orientation, new com.medg.terraingenerator.hexlib.Point(hexSize,hexSize), centerOfOriginHex);
         hexMap = new RectangularHexMap(hexMapWidth,hexMapHeight,layout);
@@ -48,28 +50,37 @@ public class HexBoard {
     }
 
     public void weather() {
+
+        allRivers = new River();
         for(Hex hex : hexMap.getHexes()) {
             int hexHeight = elevationMap.get(hex);
             Hex[] neighbors = hex.getAllNeighbors();
-            List<Integer> elevationDiffs = new ArrayList<>();
+            Map<Hex, Integer> elevationDiffs = new HashMap<>();
             for(int i = 0; i < neighbors.length; i++) {
                 if(elevationMap.keySet().contains(neighbors[i])) {
                     int elevationDiff = elevationMap.get(hex) - elevationMap.get(neighbors[i]);
-                    elevationDiffs.add(elevationDiff);
+                    elevationDiffs.put(neighbors[i], elevationDiff);
                 }
             }
             int steepestSlope = 0;
-            for(int i = 0; i < elevationDiffs.size(); i++) {
-                if(elevationDiffs.get(i) > 0 && elevationDiffs.get(i) > steepestSlope) {
-                    steepestSlope = elevationDiffs.get(i);
+            Hex steepestNeighbor = null;
+            for(Hex neighbor : elevationDiffs.keySet()) {
+                int elevationDiff = elevationDiffs.get(neighbor);
+                if(elevationDiff > 0 && elevationDiff > steepestSlope) {
+                    steepestSlope = elevationDiff;
+                    steepestNeighbor = neighbor;
                 }
             }
+
             if(steepestSlope > 0) {
                 int erosion = dice.rollD10();
                 if(erosion > steepestSlope) {
                     erosion = steepestSlope;
                 }
                 elevationMap.put(hex, hexHeight - erosion);
+            }
+            if(steepestNeighbor != null) {
+                allRivers.add(new RiverPair(hex, steepestNeighbor));
             }
         }
     }
@@ -100,5 +111,9 @@ public class HexBoard {
 
     public Layout getLayout() {
         return layout;
+    }
+
+    public River getAllRivers() {
+        return allRivers;
     }
 }
