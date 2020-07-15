@@ -30,7 +30,6 @@ public class TerrainGeneratorFrame extends JFrame {
         this.dice = dice;
 
         scrollPane = new JScrollPane(hexPanel);
-        scrollPane.getVerticalScrollBar().setUnitIncrement(hexSize);
 
         JPanel buttonPanel = new JPanel();
 

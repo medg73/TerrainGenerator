@@ -9,12 +9,10 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.List;
 
-class HexPanel extends JPanel {
+class HexPanel extends JPanel implements Scrollable{
 
     RectangularHexMap hexMap;
     HexBoard hexBoard;
@@ -29,6 +27,9 @@ class HexPanel extends JPanel {
     boolean showWaterLevel = false;
     int waterLevel = 25;
     double zoomFactor = 1.0;
+    Stroke thinLine = new BasicStroke(1.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND);
+    Stroke mediumLine = new BasicStroke(3.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND);
+    Stroke thickLine = new BasicStroke(6.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND);
 
     public HexPanel(HexBoard hexBoard) {
         setBackground(Color.WHITE);
@@ -40,6 +41,8 @@ class HexPanel extends JPanel {
                 selectHex(e.getX(),e.getY());
             }
         });
+
+
     }
 
     public void loadNewBoard(HexBoard hexBoard) {
@@ -127,14 +130,51 @@ class HexPanel extends JPanel {
 
 
     private void drawAllRivers(Graphics2D graphics2D) {
+
+        List<LineSegment> thinRivers = new ArrayList<>();
+        List<LineSegment> mediumRivers = new ArrayList<>();
+        List<LineSegment> thickRivers = new ArrayList<>();
+
+        Stroke savedStroke = graphics2D.getStroke();
+        Rectangle clipBounds = graphics2D.getClipBounds();
+
         Set<DirectedEdge> riverEdges = hexBoard.getAllRiverEdges();
         for(DirectedEdge riverEdge : riverEdges) {
             java.awt.Point point1 = centerPointMap.get(riverEdge.getSource());
             java.awt.Point point2 = centerPointMap.get(riverEdge.getSink());
-
-            graphics2D.setColor(Color.BLUE);
-            graphics2D.drawLine(point1.x, point1.y, point2.x, point2.y);
+            if(clipBounds.contains(point1) || clipBounds.contains(point2)) {
+                int flow = hexBoard.getRiverFlowByEdge(riverEdge);
+                if (flow <= 10) {
+                    thinRivers.add(new LineSegment(point1, point2));
+                } else if (flow <= 100) {
+                    mediumRivers.add(new LineSegment(point1, point2));
+                } else {
+                    thickRivers.add(new LineSegment(point1, point2));
+                }
+            }
         }
+
+        graphics2D.setColor(Color.BLUE);
+
+        graphics2D.setStroke(thinLine);
+        for(LineSegment lineSegment : thinRivers) {
+            graphics2D.drawLine(lineSegment.point1.x, lineSegment.point1.y,
+                    lineSegment.point2.x, lineSegment.point2.y);
+        }
+
+        graphics2D.setStroke(mediumLine);
+        for(LineSegment lineSegment : mediumRivers) {
+            graphics2D.drawLine(lineSegment.point1.x, lineSegment.point1.y,
+                    lineSegment.point2.x, lineSegment.point2.y);
+        }
+
+        graphics2D.setStroke(thickLine);
+        for(LineSegment lineSegment : thickRivers) {
+            graphics2D.drawLine(lineSegment.point1.x, lineSegment.point1.y,
+                    lineSegment.point2.x, lineSegment.point2.y);
+        }
+
+        graphics2D.setStroke(savedStroke);
     }
 
     private void storeHexPolygons() {
@@ -184,7 +224,11 @@ class HexPanel extends JPanel {
 
     private void drawHex(Graphics2D graphics2D, Hex hex, Color fillColor, Color edgeColor) {
 
+        Rectangle clipBounds = graphics2D.getClipBounds();
         Polygon polygon = hexPolygonMap.get(hex);
+        if(!polygon.intersects(clipBounds)) {
+            return;
+        }
 
         graphics2D.setColor(fillColor);
         graphics2D.fillPolygon(polygon);
@@ -213,7 +257,8 @@ class HexPanel extends JPanel {
         OffsetCoord offsetCoord = hexMap.getOffsetCoord(selectedHex);
         if(hexMap.getHexes().contains(selectedHex)) {
             int elevation = hexBoard.getElevation(selectedHex);
-            System.out.println("row = " + offsetCoord.row + " col = " + offsetCoord.col + " elevation = " + elevation);
+            int flow = hexBoard.getFlowIntoHex(selectedHex);
+            System.out.println("row = " + offsetCoord.row + " col = " + offsetCoord.col + " elevation = " + elevation + " flow = " + flow);
 
             if (selectedHex1 == null) {
                 selectedHex1 = selectedHex;
@@ -226,6 +271,41 @@ class HexPanel extends JPanel {
                 highlightedHexes = null;
             }
             repaint();
+        }
+    }
+
+    @Override
+    public Dimension getPreferredScrollableViewportSize() {
+        return new Dimension(250, 250);
+    }
+
+    @Override
+    public int getScrollableUnitIncrement(Rectangle visibleRect, int orientation, int direction) {
+        return hexBoard.getHexSize() * 2;
+    }
+
+    @Override
+    public int getScrollableBlockIncrement(Rectangle visibleRect, int orientation, int direction) {
+        return hexBoard.getHexSize() * 2;
+    }
+
+    @Override
+    public boolean getScrollableTracksViewportWidth() {
+        return false;
+    }
+
+    @Override
+    public boolean getScrollableTracksViewportHeight() {
+        return false;
+    }
+
+    private class LineSegment {
+        final java.awt.Point point1;
+        final java.awt.Point point2;
+
+        LineSegment(java.awt.Point point1, java.awt.Point point2) {
+            this.point1 = point1;
+            this.point2 = point2;
         }
     }
 }
