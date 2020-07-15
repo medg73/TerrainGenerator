@@ -1,7 +1,7 @@
 package com.medg.terraingenerator;
 
 import com.medg.terraingenerator.dice.Dice;
-import com.medg.terraingenerator.dice.RandomNumberGenerator;
+import com.medg.terraingenerator.hexlib.DirectedEdge;
 import com.medg.terraingenerator.hexlib.Hex;
 import com.medg.terraingenerator.hexlib.OffsetCoord;
 import org.junit.Test;
@@ -43,11 +43,11 @@ public class HexBoardTest {
         assertEquals(70, hexBoard.getElevation(hex3).intValue());
         assertEquals(80, hexBoard.getElevation(hex4).intValue());
 
-        Set<RiverPair> allRivers = hexBoard.getAllRivers();
+        Set<DirectedEdge> allRivers = hexBoard.getAllRiverEdges();
         assertEquals(3, allRivers.size());
-        RiverPair riverPair1 = new RiverPair(hex1, hex2);
-        RiverPair riverPair2 = new RiverPair(hex3, hex2);
-        RiverPair riverPair3 = new RiverPair(hex4, hex2);
+        DirectedEdge riverPair1 = new DirectedEdge(hex1, hex2);
+        DirectedEdge riverPair2 = new DirectedEdge(hex3, hex2);
+        DirectedEdge riverPair3 = new DirectedEdge(hex4, hex2);
 
         assertTrue(allRivers.contains(riverPair1));
         assertTrue(allRivers.contains(riverPair2));
@@ -95,15 +95,15 @@ public class HexBoardTest {
         assertEquals(5, hexBoard.getFlowIntoHex(hex3).intValue());
         assertEquals(0, hexBoard.getFlowIntoHex(hex4).intValue());
 
-        RiverPair riverPair1 = new RiverPair(hex4, hex3);
-        RiverPair riverPair2 = new RiverPair(hex3, hex2);
-        RiverPair riverPair3 = new RiverPair(hex2, hex1);
-        assertEquals(5, hexBoard.getFlowByRiverPair(riverPair1));
-        assertEquals(10, hexBoard.getFlowByRiverPair(riverPair2));
-        assertEquals(15, hexBoard.getFlowByRiverPair(riverPair3));
+        DirectedEdge riverPair1 = new DirectedEdge(hex4, hex3);
+        DirectedEdge riverPair2 = new DirectedEdge(hex3, hex2);
+        DirectedEdge riverPair3 = new DirectedEdge(hex2, hex1);
+        assertEquals(5, hexBoard.getRiverFlowByEdge(riverPair1));
+        assertEquals(10, hexBoard.getRiverFlowByEdge(riverPair2));
+        assertEquals(15, hexBoard.getRiverFlowByEdge(riverPair3));
 
-//        RiverPair badRiverPair = new RiverPair(hex1,hex2);
-//        assertEquals(0, hexBoard.getFlowByRiverPair(badRiverPair));
+        DirectedEdge badRiverPair = new DirectedEdge(hex1,hex2);
+        assertEquals(0, hexBoard.getRiverFlowByEdge(badRiverPair));
 
     }
 

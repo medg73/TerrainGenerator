@@ -16,9 +16,8 @@ public class HexBoard {
     private Point centerOfOriginHex;
     private Dice dice;
 
-    private Set<RiverPair> allRivers;
-
-    private Map<Hex, Integer> flowIntoHex;
+    private Set<DirectedEdge> allRiverEdges;
+    private Map<DirectedEdge, Integer> flowByEdge;
 
 //    private Map<Hex, Terrain> terrainMap;
     private Map<Hex, Integer> elevationMap;
@@ -30,8 +29,8 @@ public class HexBoard {
         this.hexMapWidth = mapWidth;
         this.hexSize = hexSize;
         this.centerOfOriginHex = new Point(hexSize, hexSize);
-        allRivers = new HashSet<>();
-        flowIntoHex = new HashMap<>();
+        allRiverEdges = new HashSet<>();
+        flowByEdge = new HashMap<>();
 
         layout = new Layout(orientation, new com.medg.terraingenerator.hexlib.Point(hexSize,hexSize), centerOfOriginHex);
         hexMap = new RectangularHexMap(hexMapWidth,hexMapHeight,layout);
@@ -52,21 +51,15 @@ public class HexBoard {
 
     public void weather() {
 
-        Map<Hex, RiverPair> riverPairsByHighHex = new HashMap<>();
-        Map<Hex, List<RiverPair>> riverPairsByLowHex = new HashMap<>();
+        Map<Hex, DirectedEdge> riverEdgesByHighHex = new HashMap<>();
+        Map<Hex, List<DirectedEdge>> riverEdgesByLowHex = new HashMap<>();
 
-        allRivers = new HashSet<>();
-        flowIntoHex = new HashMap<>();
+        allRiverEdges = new HashSet<>();
+        flowByEdge = new HashMap<>();
+
         for(Hex hex : hexMap.getHexes()) {
             int hexHeight = elevationMap.get(hex);
-            Hex[] neighbors = hex.getAllNeighbors();
-            Map<Hex, Integer> elevationDiffs = new HashMap<>();
-            for(int i = 0; i < neighbors.length; i++) {
-                if(elevationMap.keySet().contains(neighbors[i])) {
-                    int elevationDiff = elevationMap.get(hex) - elevationMap.get(neighbors[i]);
-                    elevationDiffs.put(neighbors[i], elevationDiff);
-                }
-            }
+            Map<Hex, Integer> elevationDiffs = getElevationDiffWithNeighbors(hex);
             int steepestSlope = 0;
             Hex steepestNeighbor = null;
             for(Hex neighbor : elevationDiffs.keySet()) {
@@ -83,42 +76,63 @@ public class HexBoard {
                     erosion = steepestSlope;
                 }
                 elevationMap.put(hex, hexHeight - erosion);
-                RiverPair riverPair = new RiverPair(hex, steepestNeighbor, erosion);
-                riverPairsByHighHex.put(hex, riverPair);
-                List<RiverPair> riverPairs = riverPairsByLowHex.computeIfAbsent(steepestNeighbor, k -> new ArrayList<>());
+                DirectedEdge riverPair = new DirectedEdge(hex, steepestNeighbor);
+                flowByEdge.put(riverPair, erosion);
+                riverEdgesByHighHex.put(hex, riverPair);
+                List<DirectedEdge> riverPairs = riverEdgesByLowHex.computeIfAbsent(steepestNeighbor, k -> new ArrayList<>());
                 riverPairs.add(riverPair);
-                allRivers.add(riverPair);
+                allRiverEdges.add(riverPair);
             }
         }
 
-        List<Hex> riverSources = new ArrayList<>();
-        for(RiverPair riverPair : allRivers) {
-            Hex highHex = riverPair.getHighHex();
-            if(riverPairsByLowHex.get(highHex) == null) { // river start
-                riverSources.add(highHex);
-            }
-        }
+        List<Hex> riverSources = findRiverSources(riverEdgesByLowHex);
 
+        calculateRiverFlowByEdge(riverEdgesByHighHex, riverSources);
+    }
+
+    private void calculateRiverFlowByEdge(Map<Hex, DirectedEdge> riverEdgesByHighHex, List<Hex> riverSources) {
         for(Hex sourceHex : riverSources) {
-            RiverPair startingRiverPair = riverPairsByHighHex.get(sourceHex);
-            Hex lowHex = startingRiverPair.getLowHex();
-            RiverPair downstreamRiverPair = riverPairsByHighHex.get(lowHex);
-            RiverPair upstreamRiverPair = startingRiverPair;
-            while(downstreamRiverPair != null) {
-                downstreamRiverPair.addUpstreamRiverPair(upstreamRiverPair);
-                upstreamRiverPair.setDownstreamRiverPair(downstreamRiverPair);
-                downstreamRiverPair.setFlow(downstreamRiverPair.getFlow() + upstreamRiverPair.getFlow());
-                upstreamRiverPair = downstreamRiverPair;
-                downstreamRiverPair = riverPairsByHighHex.get(downstreamRiverPair.getLowHex());
+            DirectedEdge startingRiverEdge = riverEdgesByHighHex.get(sourceHex);
+            Hex lowHex = startingRiverEdge.getSink();
+            DirectedEdge downstreamRiverEdge = riverEdgesByHighHex.get(lowHex);
+            DirectedEdge upstreamRiverEdge = startingRiverEdge;
+            while(downstreamRiverEdge != null) {
+                int flow = flowByEdge.get(downstreamRiverEdge);
+                flowByEdge.put(downstreamRiverEdge, flow + flowByEdge.get(upstreamRiverEdge));
+                upstreamRiverEdge = downstreamRiverEdge;
+                downstreamRiverEdge = riverEdgesByHighHex.get(downstreamRiverEdge.getSink());
             }
         }
     }
 
-    public int getFlowByRiverPair(RiverPair riverPair) {
+    private List<Hex> findRiverSources(Map<Hex, List<DirectedEdge>> riverEdgesByLowHex) {
+        List<Hex> riverSources = new ArrayList<>();
+        for(DirectedEdge riverEdge : allRiverEdges) {
+            Hex highHex = riverEdge.getSource();
+            if(riverEdgesByLowHex.get(highHex) == null) { // river start
+                riverSources.add(highHex);
+            }
+        }
+        return riverSources;
+    }
+
+    private Map<Hex, Integer> getElevationDiffWithNeighbors(Hex hex) {
+        Hex[] neighbors = hex.getAllNeighbors();
+        Map<Hex, Integer> elevationDiffs = new HashMap<>();
+        for(int i = 0; i < neighbors.length; i++) {
+            if(elevationMap.containsKey(neighbors[i])) {
+                int elevationDiff = elevationMap.get(hex) - elevationMap.get(neighbors[i]);
+                elevationDiffs.put(neighbors[i], elevationDiff);
+            }
+        }
+        return elevationDiffs;
+    }
+
+    public int getRiverFlowByEdge(DirectedEdge riverPair) {
         int rv = 0;
-        for(RiverPair myRiverPair : allRivers) {
+        for(DirectedEdge myRiverPair : allRiverEdges) {
             if(myRiverPair.equals(riverPair)) {
-                rv = myRiverPair.getFlow();
+                rv = flowByEdge.get(riverPair);
                 break;
             }
         }
@@ -127,9 +141,9 @@ public class HexBoard {
 
     public Integer getFlowIntoHex(Hex hex) {
         int rv = 0;
-        for(RiverPair riverPair : allRivers) {
-            if(riverPair.getLowHex().equals(hex)) {
-                rv += riverPair.getFlow();
+        for(DirectedEdge riverPair : allRiverEdges) {
+            if(riverPair.getSink().equals(hex)) {
+                rv += flowByEdge.get(riverPair);
             }
         }
         return rv;
@@ -163,8 +177,8 @@ public class HexBoard {
         return layout;
     }
 
-    public Set<RiverPair> getAllRivers() {
-        return allRivers;
+    public Set<DirectedEdge> getAllRiverEdges() {
+        return allRiverEdges;
     }
 
     public void setHexElevation(Hex hex, int elevation) {

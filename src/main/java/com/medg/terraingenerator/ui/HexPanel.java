@@ -1,8 +1,6 @@
 package com.medg.terraingenerator.ui;
 
 import com.medg.terraingenerator.HexBoard;
-import com.medg.terraingenerator.River;
-import com.medg.terraingenerator.RiverPair;
 import com.medg.terraingenerator.hexlib.*;
 import com.medg.terraingenerator.hexlib.Point;
 
@@ -129,11 +127,10 @@ class HexPanel extends JPanel {
 
 
     private void drawAllRivers(Graphics2D graphics2D) {
-        Set<RiverPair> riverPairs = hexBoard.getAllRivers();
-        for(RiverPair riverPair : riverPairs) {
-            Hex[] hexes = riverPair.getHexArray();
-            java.awt.Point point1 = centerPointMap.get(hexes[0]);
-            java.awt.Point point2 = centerPointMap.get(hexes[1]);
+        Set<DirectedEdge> riverEdges = hexBoard.getAllRiverEdges();
+        for(DirectedEdge riverEdge : riverEdges) {
+            java.awt.Point point1 = centerPointMap.get(riverEdge.getSource());
+            java.awt.Point point2 = centerPointMap.get(riverEdge.getSink());
 
             graphics2D.setColor(Color.BLUE);
             graphics2D.drawLine(point1.x, point1.y, point2.x, point2.y);
