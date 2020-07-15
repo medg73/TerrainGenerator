@@ -5,7 +5,6 @@ implementation: https://www.redblobgames.com/grids/hexagons/implementation.html
 
 TODO:
 wrapping map
-when you grab scrollbar and scroll rivers don't draw right
 make random terrain more realistic, or allow drawing
 rivers - based on steepness of slope into hex and # of hexes draining into this one
     something not quite right with rivers? they can flow uphill b/c they are calculated after

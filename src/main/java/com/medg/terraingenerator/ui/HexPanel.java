@@ -9,6 +9,7 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Rectangle2D;
 import java.util.*;
 import java.util.List;
 
@@ -136,13 +137,13 @@ class HexPanel extends JPanel implements Scrollable{
         List<LineSegment> thickRivers = new ArrayList<>();
 
         Stroke savedStroke = graphics2D.getStroke();
-        Rectangle clipBounds = graphics2D.getClipBounds();
+        Rectangle2D clipBounds = graphics2D.getClipBounds();
 
         Set<DirectedEdge> riverEdges = hexBoard.getAllRiverEdges();
         for(DirectedEdge riverEdge : riverEdges) {
             java.awt.Point point1 = centerPointMap.get(riverEdge.getSource());
             java.awt.Point point2 = centerPointMap.get(riverEdge.getSink());
-            if(clipBounds.contains(point1) || clipBounds.contains(point2)) {
+            if(clipBounds.intersectsLine(point1.x, point1.y, point2.x, point2.y)) {
                 int flow = hexBoard.getRiverFlowByEdge(riverEdge);
                 if (flow <= 10) {
                     thinRivers.add(new LineSegment(point1, point2));
