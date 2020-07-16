@@ -26,6 +26,7 @@ class HexPanel extends JPanel implements Scrollable{
     Map<Hex, Polygon> hexPolygonMap;
     Map<Hex, java.awt.Point> centerPointMap;
     boolean showWaterLevel = false;
+    boolean clickToSelect = false;
     int waterLevel = 25;
     double zoomFactor = 1.0;
     Stroke thinLine = new BasicStroke(1.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND);
@@ -34,12 +35,15 @@ class HexPanel extends JPanel implements Scrollable{
 
     public HexPanel(HexBoard hexBoard) {
         setBackground(Color.WHITE);
-
         loadNewBoard(hexBoard);
-
         addMouseListener(new MouseAdapter(){
             public void mousePressed(MouseEvent e){
-                selectHex(e.getX(),e.getY());
+                Hex hex = getClickedOnHex(e.getX(), e.getY());
+                if(clickToSelect) {
+                    selectHex(e.getX(), e.getY());
+                } else {
+                    placeMountain(hex);
+                }
             }
         });
 
@@ -115,6 +119,14 @@ class HexPanel extends JPanel implements Scrollable{
     public void setWaterLevel(int waterLevel) {
         assert(waterLevel >= 0 && waterLevel <= 100);
         this.waterLevel = waterLevel;
+    }
+
+    public boolean getClickToSelect() {
+        return clickToSelect;
+    }
+
+    public void setClickToSelect(boolean clickToSelect) {
+        this.clickToSelect = clickToSelect;
     }
 
     public boolean getShowWaterLevel() {
@@ -249,14 +261,21 @@ class HexPanel extends JPanel implements Scrollable{
         graphics2D.drawPolygon(polygon);
     }
 
-    private void selectHex(int x, int y) {
-        int scaledX = (int)(x / zoomFactor);
-        int scaledY = (int)(y / zoomFactor);
+    private Hex getClickedOnHex(int x, int y) {
+        int scaledX = (int) (x / zoomFactor);
+        int scaledY = (int) (y / zoomFactor);
         FractionalHex fractionalHex = layout.pixelToHex(new Point(scaledX, scaledY));
         Hex selectedHex = fractionalHex.round();
+        return selectedHex;
+    }
+
+    private void selectHex(int x, int y) {
+
+        Hex selectedHex = getClickedOnHex(x, y);
+
 //        System.out.println("selected hex is: " + selectedHex);
         OffsetCoord offsetCoord = hexMap.getOffsetCoord(selectedHex);
-        if(hexMap.getHexes().contains(selectedHex)) {
+        if (hexMap.getHexes().contains(selectedHex)) {
             int elevation = hexBoard.getElevation(selectedHex);
             int flow = hexBoard.getFlowIntoHex(selectedHex);
             System.out.println("row = " + offsetCoord.row + " col = " + offsetCoord.col + " elevation = " + elevation + " flow = " + flow);
@@ -273,6 +292,22 @@ class HexPanel extends JPanel implements Scrollable{
             }
             repaint();
         }
+    }
+
+    private void placeMountain(Hex hex) {
+        int elevation = 100;
+        hexBoard.setHexElevation(hex, elevation);
+        for(int radius = 1; radius < 10; radius++) {
+            Hex[] ringHexes = hex.getRing(radius);
+            int ringElevation = elevation - radius * 10;
+            for(Hex ringHex : ringHexes) {
+                Integer currentElevation = hexBoard.getElevation(ringHex);
+                if(currentElevation != null && currentElevation < ringElevation) {
+                    hexBoard.setHexElevation(ringHex, ringElevation);
+                }
+            }
+        }
+        repaint();
     }
 
     @Override

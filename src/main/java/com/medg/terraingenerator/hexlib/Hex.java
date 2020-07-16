@@ -64,6 +64,16 @@ public class Hex {
         return this.add(DIRECTIONS[direction]);
     }
 
+    Hex scale(int direction, int distance) {
+        Hex directionHex = DIRECTIONS[direction];
+        int qdiff = directionHex.getQ() * distance;
+        int rdiff = directionHex.getR() * distance;
+        int sdiff = directionHex.getS() * distance;
+        Hex scaleHex = new Hex(qdiff, rdiff, sdiff);
+        Hex rv = this.add(scaleHex);
+        return rv;
+    }
+
     public Point toPixel(Layout layout) {
         double x = (layout.orientation.f0 * this.getQ() + layout.orientation.f1 * this.getR()) * layout.size.x;
         double y = (layout.orientation.f2 * this.getQ() + layout.orientation.f3 * this.getR()) * layout.size.y;
@@ -79,6 +89,23 @@ public class Hex {
                     center.y + offset.y);
         }
         return corners;
+    }
+
+    public Hex[] getRing(int radius) {
+        assert(radius > 0);
+        Hex[] rv = new Hex[radius * 6];
+        int index = 0;
+//        Hex radiusHex = new Hex(this.getQ() - radius, this.getR() + radius, this.getS());
+        Hex radiusHex = this.scale(4, radius);
+        for(int i = 0; i < 6; i++) {
+            for(int j = 0; j < radius; j++) {
+                rv[index] = radiusHex;
+                index++;
+                radiusHex = radiusHex.neighbor(i);
+            }
+        }
+
+        return rv;
     }
 
     public Hex[] linedraw(Hex hex) {

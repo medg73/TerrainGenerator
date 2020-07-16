@@ -2,6 +2,9 @@ package com.medg.terraingenerator.hexlib;
 
 import org.junit.Test;
 
+import java.util.Arrays;
+import java.util.List;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -154,5 +157,45 @@ public class HexTest {
         assertEquals(new Hex(2, -1, -1), lineHexes3[1]);
         assertEquals(new Hex(1, 0, -1), lineHexes3[2]);
         assertEquals(start, lineHexes3[3]);
+    }
+
+    @Test
+    public void testGetRingRadius1() {
+        Hex start = new Hex(0,0,0);
+        int radius = 1;
+        Hex[] ring = start.getRing(radius);
+        assertEquals(6, ring.length);
+
+        List<Hex> neighbors = Arrays.asList(start.getAllNeighbors());
+        for(int i = 0; i < 6; i++) {
+            Hex ringHex = ring[i];
+            assertTrue(neighbors.contains(ringHex));
+        }
+    }
+
+    @Test
+    public void testGetRingRadius2() {
+        Hex start = new Hex(0,0,0);
+        int radius = 2;
+        Hex[] ring = start.getRing(radius);
+        assertEquals(12, ring.length);
+
+        for(int i = 0; i < 12; i++) {
+            assertEquals(2, ring[i].distance(start));
+        }
+
+    }
+
+    @Test
+    public void testGetRingRadius3NonZeroOrigin() {
+        Hex start = new Hex(2,-1,-1);
+        int radius = 3;
+        Hex[] ring = start.getRing(radius);
+        assertEquals(18, ring.length);
+
+        for(int i = 0; i < 18; i++) {
+            assertEquals(3, ring[i].distance(start));
+        }
+
     }
 }

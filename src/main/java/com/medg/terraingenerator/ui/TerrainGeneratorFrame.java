@@ -48,6 +48,11 @@ public class TerrainGeneratorFrame extends JFrame {
         showWaterLevelCheckbox.addActionListener(toggleShowWaterLevelAction);
         buttonPanel.add(showWaterLevelCheckbox);
 
+        ToggleSelectAction toggleSelectAction = new ToggleSelectAction();
+        JCheckBox toggleSelectCheckbox = new JCheckBox("click to select");
+        toggleSelectCheckbox.addActionListener(toggleSelectAction);
+        buttonPanel.add(toggleSelectCheckbox);
+
         ZoomChange zoomChange = new ZoomChange();
         zoomSlider = new JSlider(1, 100, 1);
         zoomSlider.addChangeListener(zoomChange);
@@ -70,6 +75,17 @@ public class TerrainGeneratorFrame extends JFrame {
                 hexPanel.setShowWaterLevel(true);
             }
             hexPanel.repaint();
+        }
+    }
+
+    private class ToggleSelectAction implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if(hexPanel.getClickToSelect()) {
+                hexPanel.setClickToSelect(false);
+            } else {
+                hexPanel.setClickToSelect(true);
+            }
         }
     }
 

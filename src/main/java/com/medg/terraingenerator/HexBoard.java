@@ -182,7 +182,9 @@ public class HexBoard {
     }
 
     public void setHexElevation(Hex hex, int elevation) {
-        elevationMap.put(hex, elevation);
+        if(hexMap.getHexes().contains(hex)) {
+            elevationMap.put(hex, elevation);
+        }
     }
 
     public Hex getHexByOffsetCoord(OffsetCoord offsetCoord) {
