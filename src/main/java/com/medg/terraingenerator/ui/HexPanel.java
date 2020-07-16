@@ -15,7 +15,6 @@ import java.util.List;
 
 class HexPanel extends JPanel implements Scrollable{
 
-    RectangularHexMap hexMap;
     HexBoard hexBoard;
     Layout layout;
     int hexSize;
@@ -52,7 +51,6 @@ class HexPanel extends JPanel implements Scrollable{
 
     public void loadNewBoard(HexBoard hexBoard) {
         this.hexBoard = hexBoard;
-        this.hexMap = hexBoard.getHexMap();
         this.hexMapWidth = hexBoard.getHexMapWidth();
         this.hexMapHeight = hexBoard.getHexMapHeight();
         this.hexSize = hexBoard.getHexSize();
@@ -86,7 +84,7 @@ class HexPanel extends JPanel implements Scrollable{
         AffineTransform affineTransform = graphics2D.getTransform();
         graphics2D.scale(zoomFactor, zoomFactor);
 
-        for(Hex hex : hexMap.getHexes()) {
+        for(Hex hex : hexBoard.getHexes()) {
             Color fillColor = getFillColor(hex);
             Color edgeColor = fillColor;
             drawHex(graphics2D, hex, fillColor, edgeColor);
@@ -191,7 +189,7 @@ class HexPanel extends JPanel implements Scrollable{
     }
 
     private void storeHexPolygons() {
-        for(Hex hex : hexMap.getHexes()) {
+        for(Hex hex : hexBoard.getHexes()) {
             Point[] cornerPoints = hex.polygonCorners(layout);
             int[] xpoints = new int[6];
             int[] ypoints = new int[6];
@@ -206,7 +204,7 @@ class HexPanel extends JPanel implements Scrollable{
 
     private void storeHexCenterPoints() {
         centerPointMap = new HashMap<>();
-        for (Hex hex : hexMap.getHexes()) {
+        for (Hex hex : hexBoard.getHexes()) {
             Point centerPoint = hex.toPixel(layout);
             int x = (int) Math.round(centerPoint.x);
             int y = (int) Math.round(centerPoint.y);
@@ -274,8 +272,8 @@ class HexPanel extends JPanel implements Scrollable{
         Hex selectedHex = getClickedOnHex(x, y);
 
 //        System.out.println("selected hex is: " + selectedHex);
-        OffsetCoord offsetCoord = hexMap.getOffsetCoord(selectedHex);
-        if (hexMap.getHexes().contains(selectedHex)) {
+        OffsetCoord offsetCoord = hexBoard.getOffsetCoord(selectedHex);
+        if (hexBoard.getHexes().contains(selectedHex)) {
             int elevation = hexBoard.getElevation(selectedHex);
             int flow = hexBoard.getFlowIntoHex(selectedHex);
             System.out.println("row = " + offsetCoord.row + " col = " + offsetCoord.col + " elevation = " + elevation + " flow = " + flow);

@@ -190,4 +190,12 @@ public class HexBoard {
     public Hex getHexByOffsetCoord(OffsetCoord offsetCoord) {
         return hexMap.getHex(offsetCoord);
     }
+
+    public OffsetCoord getOffsetCoord(Hex hex) {
+        return hexMap.getOffsetCoord(hex);
+    }
+
+    public Set<Hex> getHexes() {
+        return hexMap.getHexes();
+    }
 }
