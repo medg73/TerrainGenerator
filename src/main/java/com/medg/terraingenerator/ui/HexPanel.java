@@ -31,6 +31,8 @@ class HexPanel extends JPanel implements Scrollable{
     Stroke thinLine = new BasicStroke(1.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND);
     Stroke mediumLine = new BasicStroke(3.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND);
     Stroke thickLine = new BasicStroke(6.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND);
+    int maxX;
+    int maxY;
 
     public HexPanel(HexBoard hexBoard) {
         setBackground(Color.WHITE);
@@ -45,8 +47,6 @@ class HexPanel extends JPanel implements Scrollable{
                 }
             }
         });
-
-
     }
 
     public void loadNewBoard(HexBoard hexBoard) {
@@ -62,25 +62,23 @@ class HexPanel extends JPanel implements Scrollable{
         highlightedHexes = null;
         selectedHex1 = null;
         selectedHex2 = null;
+        maxX = maxX + hexSize;
+        maxY = maxY + hexSize;
+
+
         repaint();
     }
 
     public Dimension getPreferredSize() {
-        int width, height;
-        if(layout.getOrientation().equals(Orientation.LAYOUT_POINTY)) {
-            width = (int) (hexMapWidth * hexSize * 1.75 * zoomFactor);
-            height = (int) (hexMapHeight * hexSize * 1.51 * zoomFactor);
-        } else {
-//            width = (int) (hexMapWidth * hexSize * 1.51 * zoomFactor);
-//            height = (int) (hexMapHeight * hexSize * 1.75 * zoomFactor);
-            width = (int) (hexMapWidth * hexSize * Math.sqrt(3.0) * zoomFactor);
-            height = (int) (hexMapHeight * hexSize * 2.0 * zoomFactor);
-        }
-        return new Dimension(width, height);
+        return new Dimension(maxX, maxY);
+//        return hexPanelSizer.getPreferredSize(hexMapHeight, hexMapWidth, hexSize, layout, zoomFactor);
     }
 
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
+
+        g.setColor(Color.YELLOW);
+        g.drawRect(0, 0, this.getPreferredSize().width, this.getPreferredSize().height);
 
         Graphics2D graphics2D = (Graphics2D) g;
         AffineTransform affineTransform = graphics2D.getTransform();
@@ -205,11 +203,20 @@ class HexPanel extends JPanel implements Scrollable{
     }
 
     private void storeHexCenterPoints() {
+
+        maxX = 0;
+        maxY = 0;
         centerPointMap = new HashMap<>();
         for (Hex hex : hexBoard.getHexes()) {
             Point centerPoint = hex.toPixel(layout);
             int x = (int) Math.round(centerPoint.x);
             int y = (int) Math.round(centerPoint.y);
+            if(x > maxX) {
+                maxX = x;
+            }
+            if(y > maxY) {
+                maxY = y;
+            }
             java.awt.Point point = new java.awt.Point(x, y);
             centerPointMap.put(hex, point);
         }

@@ -19,8 +19,8 @@ public class TerrainGeneratorFrame extends JFrame {
     private HexPanel hexPanel;
     private HexBoardFactory hexBoardFactory;
     private HexBoard hexBoard;
-    private int mapHeight = 100;
-    private int mapWidth = 100;
+    private int mapHeight = 10;
+    private int mapWidth = 5;
     private int hexSize = 40;
     private Dice dice;
     private JSlider zoomSlider;
@@ -151,7 +151,7 @@ public class TerrainGeneratorFrame extends JFrame {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            hexBoard = hexBoardFactory.makeHexBoard(mapWidth, mapHeight, hexSize);
+            hexBoard = hexBoardFactory.makeHexBoard(mapHeight, mapWidth, hexSize);
             hexPanel.loadNewBoard(hexBoard);
         }
 

@@ -12,7 +12,7 @@ public class HexBoard {
     private int hexSize;
     private int hexMapHeight;
     private int hexMapWidth;
-    private Orientation orientation = Orientation.LAYOUT_FLAT;
+    private Orientation orientation = Orientation.LAYOUT_POINTY;
     private Point centerOfOriginHex;
     private Dice dice;
 
@@ -32,7 +32,7 @@ public class HexBoard {
         flowByEdge = new HashMap<>();
 
         layout = new Layout(orientation, new com.medg.terraingenerator.hexlib.Point(hexSize,hexSize), centerOfOriginHex);
-        hexMap = new RectangularHexMap(hexMapWidth,hexMapHeight,layout);
+        hexMap = new RectangularHexMap(hexMapHeight, hexMapWidth, layout);
 
         elevationMap = new HashMap<>();
         for(Hex hex : hexMap.getHexes()) {

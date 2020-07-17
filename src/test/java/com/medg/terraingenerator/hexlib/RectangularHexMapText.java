@@ -2,8 +2,6 @@ package com.medg.terraingenerator.hexlib;
 
 import org.junit.Test;
 
-import java.util.IllegalFormatWidthException;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -13,7 +11,7 @@ public class RectangularHexMapText {
         int height = 2;
         int width = 2;
         Layout layout = new Layout(Orientation.LAYOUT_POINTY, new Point(10,10), new Point(0,0));
-        RectangularHexMap hexMap = new RectangularHexMap(width, height, layout);
+        RectangularHexMap hexMap = new RectangularHexMap(height, width, layout);
         assertEquals(4, hexMap.getHexes().size());
         assertTrue(hexMap.getHexes().contains(new Hex(0,0,0)));
         assertTrue(hexMap.getHexes().contains(new Hex(1, 0, -1)));
@@ -24,14 +22,24 @@ public class RectangularHexMapText {
     @Test
     public void testMakeFlatMap() {
         int height = 2;
-        int width = 2;
+        int width = 3;
         Layout layout = new Layout(Orientation.LAYOUT_FLAT, new Point(10,10), new Point(0,0));
-        RectangularHexMap hexMap = new RectangularHexMap(width, height, layout);
-        assertEquals(4, hexMap.getHexes().size());
-        assertTrue(hexMap.getHexes().contains(new Hex(0,0,0)));
-        assertTrue(hexMap.getHexes().contains(new Hex(1, 0, -1)));
-        assertTrue(hexMap.getHexes().contains(new Hex(0, 1, -1)));
-        assertTrue(hexMap.getHexes().contains(new Hex(1, 1, -2)));
+        RectangularHexMap hexMap = new RectangularHexMap(height, width, layout);
+        assertEquals(6, hexMap.getHexes().size());
+
+        Hex hex1 = new Hex(0,0,0);
+        Hex hex2 = new Hex(1, 0, -1);
+        Hex hex3 = new Hex(0, 1, -1);
+        Hex hex4 = new Hex(1, 1, -2);
+        Hex hex5 = new Hex(2, 0, -2);
+        Hex hex6 = new Hex(2, -1, -1);
+
+        assertTrue(hexMap.getHexes().contains(hex1));
+        assertTrue(hexMap.getHexes().contains(hex2));
+        assertTrue(hexMap.getHexes().contains(hex3));
+        assertTrue(hexMap.getHexes().contains(hex4));
+        assertTrue(hexMap.getHexes().contains(hex5));
+        assertTrue(hexMap.getHexes().contains(hex6));
     }
 
     @Test
@@ -39,7 +47,7 @@ public class RectangularHexMapText {
         int height = 2;
         int width = 2;
         Layout layout = new Layout(Orientation.LAYOUT_POINTY, new Point(10,10), new Point(0,0));
-        RectangularHexMap hexMap = new RectangularHexMap(width, height, layout);
+        RectangularHexMap hexMap = new RectangularHexMap(height, width, layout);
 
         Hex hex1 = new Hex(0, 0, 0);
         Hex hex2 = new Hex(1, 1, -2);
@@ -68,7 +76,7 @@ public class RectangularHexMapText {
         int height = 2;
         int width = 2;
         Layout layout = new Layout(Orientation.LAYOUT_FLAT, new Point(10,10), new Point(0,0));
-        RectangularHexMap hexMap = new RectangularHexMap(width, height, layout);
+        RectangularHexMap hexMap = new RectangularHexMap(height, width, layout);
 
         Hex hex1 = new Hex(0, 0, 0);
         Hex hex2 = new Hex(1, 1, -2);

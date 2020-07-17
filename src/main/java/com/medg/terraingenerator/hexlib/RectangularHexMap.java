@@ -10,7 +10,7 @@ public class RectangularHexMap {
     private int mapHeight;
     private Layout layout;
 
-    public RectangularHexMap(int mapWidth, int mapHeight, Layout layout) {
+    public RectangularHexMap(int mapHeight, int mapWidth, Layout layout) {
         this.mapHeight = mapHeight;
         this.mapWidth = mapWidth;
         this.layout = layout;
@@ -24,9 +24,9 @@ public class RectangularHexMap {
                 }
             }
         } else {
-            for(int q = 0; q < mapHeight; q++) {
+            for(int q = 0; q < mapWidth; q++) {
                 int qOffset = (int)Math.floor(q / 2.0);
-                for(int r = -qOffset; r < mapWidth - qOffset; r++) {
+                for(int r = -qOffset; r < mapHeight - qOffset; r++) {
                     hexes.add(new Hex(q, r, -q - r));
                 }
             }

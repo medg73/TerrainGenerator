@@ -6,7 +6,7 @@ implementation: https://www.redblobgames.com/grids/hexagons/implementation.html
 TODO:
 change hexlib to use List instead of [] in returns from public methods?
 fixup UI to have drawing panel with different things to draw
-geometry kind of screwed up - something wrong with getPreferredSize
+repaint the scrollview when making new map
 clean up hexpanel
 clean up hexboard
 
