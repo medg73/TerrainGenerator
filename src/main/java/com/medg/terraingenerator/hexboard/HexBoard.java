@@ -1,4 +1,4 @@
-package com.medg.terraingenerator;
+package com.medg.terraingenerator.hexboard;
 
 import com.medg.terraingenerator.dice.Dice;
 import com.medg.terraingenerator.hexlib.*;
@@ -22,8 +22,7 @@ public class HexBoard {
 //    private Map<Hex, Terrain> terrainMap;
     private Map<Hex, Integer> elevationMap;
 
-    public HexBoard(Dice dice, int mapHeight, int mapWidth, int hexSize) {
-
+    HexBoard(Dice dice, int mapHeight, int mapWidth, int hexSize) {
         this.dice = dice;
         this.hexMapHeight = mapHeight;
         this.hexMapWidth = mapWidth;

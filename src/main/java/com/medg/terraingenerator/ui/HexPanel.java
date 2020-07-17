@@ -1,6 +1,6 @@
 package com.medg.terraingenerator.ui;
 
-import com.medg.terraingenerator.HexBoard;
+import com.medg.terraingenerator.hexboard.HexBoard;
 import com.medg.terraingenerator.hexlib.*;
 import com.medg.terraingenerator.hexlib.Point;
 
@@ -71,8 +71,10 @@ class HexPanel extends JPanel implements Scrollable{
             width = (int) (hexMapWidth * hexSize * 1.75 * zoomFactor);
             height = (int) (hexMapHeight * hexSize * 1.51 * zoomFactor);
         } else {
-            width = (int) (hexMapWidth * hexSize * 1.51 * zoomFactor);
-            height = (int) (hexMapHeight * hexSize * 1.75 * zoomFactor);
+//            width = (int) (hexMapWidth * hexSize * 1.51 * zoomFactor);
+//            height = (int) (hexMapHeight * hexSize * 1.75 * zoomFactor);
+            width = (int) (hexMapWidth * hexSize * Math.sqrt(3.0) * zoomFactor);
+            height = (int) (hexMapHeight * hexSize * 2.0 * zoomFactor);
         }
         return new Dimension(width, height);
     }

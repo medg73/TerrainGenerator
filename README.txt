@@ -6,8 +6,9 @@ implementation: https://www.redblobgames.com/grids/hexagons/implementation.html
 TODO:
 change hexlib to use List instead of [] in returns from public methods?
 fixup UI to have drawing panel with different things to draw
-hexboard factory class
+geometry kind of screwed up - something wrong with getPreferredSize
 clean up hexpanel
+clean up hexboard
 
 wrapping map
 make random terrain more realistic, or allow drawing

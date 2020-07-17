@@ -1,6 +1,7 @@
-package com.medg.terraingenerator;
+package com.medg.terraingenerator.hexboard;
 
 import com.medg.terraingenerator.dice.Dice;
+import com.medg.terraingenerator.hexboard.HexBoard;
 import com.medg.terraingenerator.hexlib.DirectedEdge;
 import com.medg.terraingenerator.hexlib.Hex;
 import com.medg.terraingenerator.hexlib.OffsetCoord;
