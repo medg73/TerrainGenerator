@@ -78,7 +78,7 @@ public class HexBoardTest {
     public void testWaterFlow() {
         Dice dice = mock(Dice.class);
         when(dice.rollD10()).thenReturn(5);
-        HexBoard hexBoard = new HexBoard(dice, 4, 1, 40);
+        HexBoard hexBoard = new HexBoard(dice, 1, 4, 40);
         Hex hex1 = hexBoard.getHexByOffsetCoord(new OffsetCoord(0, 0));
         Hex hex2 = hexBoard.getHexByOffsetCoord(new OffsetCoord(0, 1));
         Hex hex3 = hexBoard.getHexByOffsetCoord(new OffsetCoord(0, 2));

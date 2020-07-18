@@ -15,24 +15,24 @@ import java.util.List;
 
 class HexPanel extends JPanel implements Scrollable{
 
-    HexBoard hexBoard;
-    Layout layout;
-    int hexSize;
-    int hexMapHeight;
-    int hexMapWidth;
-    Hex selectedHex1, selectedHex2;
-    Set<Hex> highlightedHexes;
-    Map<Hex, Polygon> hexPolygonMap;
-    Map<Hex, java.awt.Point> centerPointMap;
-    boolean showWaterLevel = false;
-    boolean clickToSelect = false;
-    int waterLevel = 25;
-    double zoomFactor = 1.0;
-    Stroke thinLine = new BasicStroke(1.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND);
-    Stroke mediumLine = new BasicStroke(3.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND);
-    Stroke thickLine = new BasicStroke(6.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND);
-    int maxX;
-    int maxY;
+    private HexBoard hexBoard;
+    private Layout layout;
+    private int hexSize;
+    private int hexMapHeight;
+    private int hexMapWidth;
+    private Hex selectedHex1, selectedHex2;
+    private Set<Hex> highlightedHexes;
+    private Map<Hex, Polygon> hexPolygonMap;
+    private Map<Hex, java.awt.Point> centerPointMap;
+    private boolean showWaterLevel = false;
+    private boolean clickToSelect = false;
+    private int waterLevel = 25;
+    private double zoomFactor = 1.0;
+    private Stroke thinLine = new BasicStroke(1.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND);
+    private Stroke mediumLine = new BasicStroke(3.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND);
+    private Stroke thickLine = new BasicStroke(6.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND);
+    private int maxX;
+    private int maxY;
 
     public HexPanel(HexBoard hexBoard) {
         setBackground(Color.WHITE);
@@ -67,6 +67,10 @@ class HexPanel extends JPanel implements Scrollable{
 
 
         repaint();
+    }
+
+    public HexBoard getHexBoard() {
+        return this.hexBoard;
     }
 
     public Dimension getPreferredSize() {
@@ -340,6 +344,10 @@ class HexPanel extends JPanel implements Scrollable{
     @Override
     public boolean getScrollableTracksViewportHeight() {
         return false;
+    }
+
+    public void weatherMap() {
+        hexBoard.weather();
     }
 
     private class LineSegment {
