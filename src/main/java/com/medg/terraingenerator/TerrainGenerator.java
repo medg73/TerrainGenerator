@@ -2,7 +2,6 @@ package com.medg.terraingenerator;
 
 import com.medg.terraingenerator.dice.Dice;
 import com.medg.terraingenerator.dice.RandomNumberGenerator;
-import com.medg.terraingenerator.hexboard.HexBoard;
 import com.medg.terraingenerator.hexboard.HexBoardFactory;
 import com.medg.terraingenerator.ui.TerrainGeneratorFrame;
 

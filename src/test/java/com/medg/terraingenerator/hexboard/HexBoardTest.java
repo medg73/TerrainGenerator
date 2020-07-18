@@ -5,6 +5,7 @@ import com.medg.terraingenerator.hexboard.HexBoard;
 import com.medg.terraingenerator.hexlib.DirectedEdge;
 import com.medg.terraingenerator.hexlib.Hex;
 import com.medg.terraingenerator.hexlib.OffsetCoord;
+import com.medg.terraingenerator.hexlib.Orientation;
 import org.junit.Test;
 
 import java.util.Set;
@@ -21,7 +22,7 @@ public class HexBoardTest {
         Dice dice = mock(Dice.class);
 //        when(dice.rollPercent()).thenReturn(50).thenReturn(75);
         when(dice.rollD10()).thenReturn(5);
-        HexBoard hexBoard = new HexBoard(dice, 2, 2, 40);
+        HexBoard hexBoard = new HexBoard(dice, 2, 2, 40, Orientation.LAYOUT_POINTY);
 
         Hex hex1 = new Hex(0,0,0);
         Hex hex2 = new Hex(0, 1, -1);
@@ -78,7 +79,7 @@ public class HexBoardTest {
     public void testWaterFlow() {
         Dice dice = mock(Dice.class);
         when(dice.rollD10()).thenReturn(5);
-        HexBoard hexBoard = new HexBoard(dice, 1, 4, 40);
+        HexBoard hexBoard = new HexBoard(dice, 1, 4, 40, Orientation.LAYOUT_POINTY);
         Hex hex1 = hexBoard.getHexByOffsetCoord(new OffsetCoord(0, 0));
         Hex hex2 = hexBoard.getHexByOffsetCoord(new OffsetCoord(0, 1));
         Hex hex3 = hexBoard.getHexByOffsetCoord(new OffsetCoord(0, 2));

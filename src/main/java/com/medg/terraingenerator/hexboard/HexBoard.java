@@ -12,7 +12,7 @@ public class HexBoard {
     private int hexSize;
     private int hexMapHeight;
     private int hexMapWidth;
-    private Orientation orientation = Orientation.LAYOUT_POINTY;
+    private Orientation orientation;
     private Point centerOfOriginHex;
     private Dice dice;
 
@@ -22,11 +22,12 @@ public class HexBoard {
 //    private Map<Hex, Terrain> terrainMap;
     private Map<Hex, Integer> elevationMap;
 
-    HexBoard(Dice dice, int mapHeight, int mapWidth, int hexSize) {
+    HexBoard(Dice dice, int mapHeight, int mapWidth, int hexSize, Orientation orientation) {
         this.dice = dice;
         this.hexMapHeight = mapHeight;
         this.hexMapWidth = mapWidth;
         this.hexSize = hexSize;
+        this.orientation = orientation;
         this.centerOfOriginHex = new Point(hexSize, hexSize);
         allRiverEdges = new HashSet<>();
         flowByEdge = new HashMap<>();

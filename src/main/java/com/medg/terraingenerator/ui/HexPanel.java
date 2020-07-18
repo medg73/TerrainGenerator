@@ -75,7 +75,6 @@ class HexPanel extends JPanel implements Scrollable{
 
     public Dimension getPreferredSize() {
         return new Dimension(maxX, maxY);
-//        return hexPanelSizer.getPreferredSize(hexMapHeight, hexMapWidth, hexSize, layout, zoomFactor);
     }
 
     public void paintComponent(Graphics g) {

@@ -3,14 +3,10 @@ package com.medg.terraingenerator.ui;
 import com.medg.terraingenerator.hexboard.HexBoard;
 import com.medg.terraingenerator.hexboard.HexBoardFactory;
 import com.medg.terraingenerator.dice.Dice;
+import com.medg.terraingenerator.hexlib.Orientation;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.text.NumberFormat;
 
 public class TerrainGeneratorFrame extends JFrame {
 
@@ -25,7 +21,7 @@ public class TerrainGeneratorFrame extends JFrame {
 
     public TerrainGeneratorFrame(HexBoardFactory hexBoardFactory, Dice dice) {
         this.hexBoardFactory = hexBoardFactory;
-        this.hexBoard = hexBoardFactory.makeHexBoard(mapHeight, mapWidth, hexSize);
+        this.hexBoard = hexBoardFactory.makeHexBoard(mapHeight, mapWidth, hexSize, HexBoardFactory.DefaultOrientation);
         this.hexPanel = new HexPanel(hexBoard);
         this.mapHeight = hexBoard.getHexMapHeight();
         this.mapWidth = hexBoard.getHexMapWidth();
