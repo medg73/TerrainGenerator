@@ -24,6 +24,11 @@ public class ButtonPanel extends JPanel {
 
         this.add(makeMapPanel);
 
+        AddRandomTerrainAction addRandomTerrainAction = new AddRandomTerrainAction();
+        JButton addRandomTerrainButton = new JButton("add random terrain");
+        addRandomTerrainButton.addActionListener(addRandomTerrainAction);
+        this.add(addRandomTerrainButton);
+
         WeatherMapAction weatherMapAction = new WeatherMapAction();
         JButton weatherMapButton = new JButton("weather map");
         weatherMapButton.addActionListener(weatherMapAction);
@@ -47,6 +52,14 @@ public class ButtonPanel extends JPanel {
         zoomSlider.addChangeListener(zoomChange);
         this.add(zoomSlider);
 
+    }
+
+    private class AddRandomTerrainAction implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            hexPanel.addRandomTerrain();
+            hexPanel.repaint();
+        }
     }
 
     private class WeatherMapAction implements ActionListener {

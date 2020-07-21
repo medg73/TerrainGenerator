@@ -69,10 +69,6 @@ class HexPanel extends JPanel implements Scrollable{
         repaint();
     }
 
-    public HexBoard getHexBoard() {
-        return this.hexBoard;
-    }
-
     public Dimension getPreferredSize() {
         return new Dimension(maxX, maxY);
     }
@@ -111,7 +107,9 @@ class HexPanel extends JPanel implements Scrollable{
 
     }
 
-
+    public void addRandomTerrain() {
+        this.hexBoard.addRandomTerrain();
+    }
 
     public int getWaterLevel() {
         return waterLevel;
@@ -153,14 +151,14 @@ class HexPanel extends JPanel implements Scrollable{
         Rectangle2D clipBounds = graphics2D.getClipBounds();
 
         Set<DirectedEdge> riverEdges = hexBoard.getAllRiverEdges();
-        for(DirectedEdge riverEdge : riverEdges) {
+        for (DirectedEdge riverEdge : riverEdges) {
             java.awt.Point point1 = centerPointMap.get(riverEdge.getSource());
             java.awt.Point point2 = centerPointMap.get(riverEdge.getSink());
-            if(clipBounds.intersectsLine(point1.x, point1.y, point2.x, point2.y)) {
+            if (clipBounds.intersectsLine(point1.x, point1.y, point2.x, point2.y)) {
                 int flow = hexBoard.getRiverFlowByEdge(riverEdge);
-                if (flow <= 10) {
+                if (flow <= 2) {
                     thinRivers.add(new LineSegment(point1, point2));
-                } else if (flow <= 100) {
+                } else if (flow <= 10) {
                     mediumRivers.add(new LineSegment(point1, point2));
                 } else {
                     thickRivers.add(new LineSegment(point1, point2));
@@ -305,18 +303,7 @@ class HexPanel extends JPanel implements Scrollable{
     }
 
     private void placeMountain(Hex hex) {
-        int elevation = 100;
-        hexBoard.setHexElevation(hex, elevation);
-        for(int radius = 1; radius < 10; radius++) {
-            Hex[] ringHexes = hex.getRing(radius);
-            int ringElevation = elevation - radius * 10;
-            for(Hex ringHex : ringHexes) {
-                Integer currentElevation = hexBoard.getElevation(ringHex);
-                if(currentElevation != null && currentElevation < ringElevation) {
-                    hexBoard.setHexElevation(ringHex, ringElevation);
-                }
-            }
-        }
+        hexBoard.placeMountain(hex);
         repaint();
     }
 

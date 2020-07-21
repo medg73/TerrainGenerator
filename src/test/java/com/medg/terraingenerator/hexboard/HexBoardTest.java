@@ -1,7 +1,6 @@
 package com.medg.terraingenerator.hexboard;
 
 import com.medg.terraingenerator.dice.Dice;
-import com.medg.terraingenerator.hexboard.HexBoard;
 import com.medg.terraingenerator.hexlib.DirectedEdge;
 import com.medg.terraingenerator.hexlib.Hex;
 import com.medg.terraingenerator.hexlib.OffsetCoord;
@@ -10,8 +9,7 @@ import org.junit.Test;
 
 import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -39,11 +37,12 @@ public class HexBoardTest {
         hexBoard.setHexElevation(hex2, 50);
         hexBoard.setHexElevation(hex3, 75);
         hexBoard.setHexElevation(hex4, 85);
+
         hexBoard.weather();
-        assertEquals(70, hexBoard.getElevation(hex1).intValue());
+        assertEquals(74, hexBoard.getElevation(hex1).intValue());
         assertEquals(50, hexBoard.getElevation(hex2).intValue());
-        assertEquals(70, hexBoard.getElevation(hex3).intValue());
-        assertEquals(80, hexBoard.getElevation(hex4).intValue());
+        assertEquals(74, hexBoard.getElevation(hex3).intValue());
+        assertEquals(84, hexBoard.getElevation(hex4).intValue());
 
         Set<DirectedEdge> allRivers = hexBoard.getAllRiverEdges();
         assertEquals(3, allRivers.size());
@@ -60,7 +59,7 @@ public class HexBoardTest {
         int flow3 = hexBoard.getFlowIntoHex(hex3);
         int flow4 = hexBoard.getFlowIntoHex(hex4);
 
-        assertEquals(15, flow2);
+        assertEquals(3, flow2);
         assertEquals(0, flow1);
         assertEquals(0, flow3);
         assertEquals(0, flow4);
@@ -92,20 +91,48 @@ public class HexBoardTest {
 
         hexBoard.weather();
 
-        assertEquals(15, hexBoard.getFlowIntoHex(hex1).intValue());
-        assertEquals(10, hexBoard.getFlowIntoHex(hex2).intValue());
-        assertEquals(5, hexBoard.getFlowIntoHex(hex3).intValue());
+        assertEquals(3, hexBoard.getFlowIntoHex(hex1).intValue());
+        assertEquals(2, hexBoard.getFlowIntoHex(hex2).intValue());
+        assertEquals(1, hexBoard.getFlowIntoHex(hex3).intValue());
         assertEquals(0, hexBoard.getFlowIntoHex(hex4).intValue());
 
         DirectedEdge riverPair1 = new DirectedEdge(hex4, hex3);
         DirectedEdge riverPair2 = new DirectedEdge(hex3, hex2);
         DirectedEdge riverPair3 = new DirectedEdge(hex2, hex1);
-        assertEquals(5, hexBoard.getRiverFlowByEdge(riverPair1));
-        assertEquals(10, hexBoard.getRiverFlowByEdge(riverPair2));
-        assertEquals(15, hexBoard.getRiverFlowByEdge(riverPair3));
+        assertEquals(1, hexBoard.getRiverFlowByEdge(riverPair1));
+        assertEquals(2, hexBoard.getRiverFlowByEdge(riverPair2));
+        assertEquals(3, hexBoard.getRiverFlowByEdge(riverPair3));
 
         DirectedEdge badRiverPair = new DirectedEdge(hex1,hex2);
         assertEquals(0, hexBoard.getRiverFlowByEdge(badRiverPair));
+
+    }
+
+    @Test
+    public void testPlaceMountain() {
+        Dice dice = mock(Dice.class);
+        HexBoard hexBoard = new HexBoard(dice, 100, 100, 40, Orientation.LAYOUT_POINTY);
+
+        Hex hex = hexBoard.getHexByOffsetCoord(new OffsetCoord(50, 50));
+        hexBoard.placeMountain(hex);
+        assertEquals(100, hexBoard.getElevation(hex).intValue());
+        for(int i = 1; i <= 9; i++) {
+            hex = hex.getAllNeighbors()[0];
+            assertEquals(100 - i*10, hexBoard.getElevation(hex).intValue());
+        }
+        hex = hex.getAllNeighbors()[0];
+        assertEquals(1, hexBoard.getElevation(hex).intValue());
+    }
+
+    @Test
+    public void testGetElevation() {
+        Dice dice = mock(Dice.class);
+        HexBoard hexBoard =  new HexBoard(dice, 2, 2, 40, Orientation.LAYOUT_POINTY);
+        Hex offBoardHex = hexBoard.getHexByOffsetCoord(new OffsetCoord(4, 4));
+        assertNull(hexBoard.getElevation(offBoardHex));
+
+        Hex onBoardHex = hexBoard.getHexByOffsetCoord(new OffsetCoord(0, 0));
+        assertEquals(1, hexBoard.getElevation(onBoardHex).intValue());
 
     }
 
